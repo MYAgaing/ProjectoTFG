@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-ReviewmerterApplication<Reviewmerter>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.reviewmeter.tfg.ReviewmerterApplication",
+            "projectName": "Reviewmerter",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
