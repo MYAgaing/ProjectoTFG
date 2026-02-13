@@ -15,7 +15,7 @@ export class AuthServiceTs {
       email,
       password
     }, {
-      responseType: 'text' // ⚠️ importante porque devuelves String
+      responseType: 'text'
     });
   }
 

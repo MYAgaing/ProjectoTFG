@@ -21,7 +21,7 @@ export class Home {
       name: "Sony WH-1000XM5",
       rating: 4.7,
       reviews: "8,934",
-      img: "https://images.unsplash.com/photo-1580894908361-967195033215"
+      img: "https://www.sony.com/is/image/gwtprod/6145c1d32e6ac8e63a46c912dc33c5bb?fmt=png-alpha&wid=515&hei=515&trf=trim"
     },
     {
       name: "MacBook Air M3",

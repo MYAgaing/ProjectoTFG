@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { AuthServiceTs } from '../Auth/ServiceAuth/auth.service';
+import { RouterLink } from "@angular/router";
 
 @Component({
   selector: 'app-user-profile',
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './user-profile.html',
   styleUrl: './user-profile.css',
 })
