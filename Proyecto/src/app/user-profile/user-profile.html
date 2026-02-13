@@ -1,0 +1,18 @@
+<div *ngIf="user" class="container py-5">
+  <h2>Bienvenido, {{ user.nombre }}</h2>
+  <p>Email: {{ user.email }}</p>
+
+  <h4 class="mt-4">Tus reseñas</h4>
+  <div *ngIf="user.reviews?.length > 0; else noReviews">
+    <div *ngFor="let r of user.reviews" class="card mb-3">
+      <div class="card-body">
+        <h6 class="card-title">{{ r.productName }}</h6>
+        <p>{{ r.comment }}</p>
+        <small>⭐ {{ r.rating }}</small>
+      </div>
+    </div>
+  </div>
+  <ng-template #noReviews>
+    <p>No has escrito ninguna reseña todavía.</p>
+  </ng-template>
+</div>

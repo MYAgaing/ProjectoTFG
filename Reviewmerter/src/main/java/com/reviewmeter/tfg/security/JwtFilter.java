@@ -32,35 +32,43 @@ public class JwtFilter extends OncePerRequestFilter {
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
+	        throws ServletException, IOException {
 
-		// 1️⃣ Leer header Authorization
-		String header = request.getHeader("Authorization");
+	    // ⚡ Ignorar login y register
+	    String path = request.getRequestURI();
+	    if (path.equals("/auth/login") || path.equals("/auth/register")) {
+	        filterChain.doFilter(request, response); // deja pasar
+	        return;
+	    }
 
-		if (header != null && header.startsWith("Bearer ")) {
-			String token = header.substring(7); // quitar "Bearer "
+	    // 1️⃣ Leer header Authorization
+	    String header = request.getHeader("Authorization");
 
-			try {
-				// 2️⃣ Extraer email del token
-				String email = jwtService.extractEmail(token);
+	    if (header != null && header.startsWith("Bearer ")) {
+	        String token = header.substring(7); // quitar "Bearer "
 
-				// 3️⃣ Cargar usuario desde BD
-				UserDetails user = userDetailsService.loadUserByUsername(email);
+	        try {
+	            // 2️⃣ Extraer email del token
+	            String email = jwtService.extractEmail(token);
 
-				// 4️⃣ Crear autenticación para Spring Security
-				UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, null,
-						user.getAuthorities());
+	            // 3️⃣ Cargar usuario desde BD
+	            UserDetails user = userDetailsService.loadUserByUsername(email);
 
-				// 5️⃣ Poner en SecurityContext
-				SecurityContextHolder.getContext().setAuthentication(auth);
+	            // 4️⃣ Crear autenticación para Spring Security
+	            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, null,
+	                    user.getAuthorities());
 
-			} catch (Exception e) {
-				// Token inválido o expirado
-				System.out.println("Token no válido: " + e.getMessage());
-			}
-		}
+	            // 5️⃣ Poner en SecurityContext
+	            SecurityContextHolder.getContext().setAuthentication(auth);
 
-		// 6️⃣ Continuar con la cadena de filtros
-		filterChain.doFilter(request, response);
+	        } catch (Exception e) {
+	            // Token inválido o expirado
+	            System.out.println("Token no válido: " + e.getMessage());
+	        }
+	    }
+
+	    // 6️⃣ Continuar con la cadena de filtros
+	    filterChain.doFilter(request, response);
 	}
+
 }

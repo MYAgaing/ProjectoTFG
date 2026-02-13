@@ -11,6 +11,7 @@ import com.reviewmeter.tfg.service.comentarioService;
 
 @RestController
 @RequestMapping("/comentarios")
+@CrossOrigin(origins = "*")
 public class comentarioController {
 	
 	@Autowired

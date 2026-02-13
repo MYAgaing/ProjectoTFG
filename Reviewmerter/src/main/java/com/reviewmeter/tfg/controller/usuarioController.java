@@ -4,12 +4,12 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import com.reviewmeter.tfg.model.Usuario;
 import com.reviewmeter.tfg.repository.usuarioRepository;
 import com.reviewmeter.tfg.service.usuarioService;
+import com.reviewmeter.tfg.security.JwtService;
 
 @RestController
 @RequestMapping("/usuario")
@@ -21,6 +21,9 @@ public class usuarioController {
 	
 	@Autowired
 	private usuarioRepository usuarioRepository;
+	
+	@Autowired
+	private JwtService jwtService;
 
     @GetMapping
     public ResponseEntity<List<Usuario>> getUsuarios() {
@@ -28,11 +31,14 @@ public class usuarioController {
     }
     
     @GetMapping("/me")
-    public Usuario getMiPerfil(@AuthenticationPrincipal Usuario usuarioLogueado) {
-        // Spring Security inyecta automáticamente el usuario que hizo login
-        return usuarioRepository.findById(usuarioLogueado.getIdUsuario())
+    public Usuario getMiPerfil(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7); // quitar "Bearer "
+        String email = jwtService.extractEmail(token);
+        return usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
     }
+
+
 
     @GetMapping("/{id}")
     public ResponseEntity<Usuario> getUsuario(@PathVariable Long id) {
