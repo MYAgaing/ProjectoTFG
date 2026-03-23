@@ -40,6 +40,8 @@ public class SecurityConfig {
                     .requestMatchers("/admin/**").hasRole("ADMIN")
                     // Usuario logueado
                     .requestMatchers("/usuario/me").hasAnyRole("USER","ADMIN")
+                    // Categorias
+                    .requestMatchers("/api/categorias/**").permitAll()
                     // Resto protegido
                     .anyRequest().authenticated()
             );

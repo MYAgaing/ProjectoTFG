@@ -17,4 +17,5 @@ public interface productoService {
 
 	String borrarProducto(Long id);
 
+	List<Producto> getProductosPorCategoria(Long id);
 }

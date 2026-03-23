@@ -1,207 +1,221 @@
-<!DOCTYPE html>
-<html lang="es">
+<!-- src/app/home/home.component.html -->
+<div class="min-h-screen bg-gray-50">
 
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ReviewHub</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="home.css">
-</head>
+  <!-- Navbar -->
+  <nav class="sticky top-0 bg-white shadow py-3 z-50">
+    <div class="container mx-auto px-4 flex items-center justify-between">
+      <a href="#" class="flex items-center space-x-3">
+        <span class="bg-blue-600 text-white text-2xl font-bold px-3 py-2 rounded">R</span>
+        <span class="font-bold text-lg text-black">Reviewmeter</span>
+      </a>
+      <form class="flex-1 mx-4">
+        <input type="search" placeholder="Buscar productos, marcas o categorías..."
+          class="w-full border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </form>
+      <div class="flex items-center space-x-3">
+        <a href="#" class="bg-blue-600 text-white px-4 py-2 rounded-full flex items-center gap-2 hover:bg-blue-700 transition">Categorías</a>
+        <button routerLink="/login"
+          class="bg-blue-600 text-white px-4 py-2 rounded-full flex items-center gap-2 hover:bg-blue-700 transition">
+          <i class="bi bi-person"></i> Iniciar sesión
+        </button>
+      </div>
+    </div>
+  </nav>
 
-<body>
-    <nav class="navbar navbar-expand-lg bg-white shadow-sm py-3 sticky-top">
-        <div class="container">
-            <a class="navbar-brand fw-bold text-black d-flex justify-content-center align-items-center" href="#">
-                <span class="logo fs-1 px-3 rounded bg-primary text-white mx-3">R</span>
-                <span>Reviewmeter</span>
-            </a>
-            <form class="d-flex flex-grow-1 mx-4">
-                <input class="form-control rounded-pill" type="search"
-                    placeholder="Buscar productos, marcas o categorías...">
-            </form>
-            <div class="d-flex align-items-center gap-3">
-                <a href="#" class="text-dark text-decoration-none">Categorías</a>
-                <button routerLink="/login" class="btn btn-primary rounded-pill">
-                    <i class="bi bi-person"></i> Iniciar sesión
-                </button>
-            </div>
+  <!-- Hero -->
+  <section class="bg-blue-600 text-white py-20">
+    <div class="container mx-auto px-4">
+      <h1 class="text-4xl md:text-5xl font-bold leading-tight">Descubre reseñas auténticas<br>de productos</h1>
+      <p class="mt-4 text-lg md:text-xl">Más de 10 millones de opiniones verificadas para ayudarte a tomar la mejor decisión de compra.</p>
+      <div class="mt-6 flex flex-wrap gap-4">
+        <button routerLink="/categorias" class="bg-white text-blue-600 px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition">
+          Explorar categorías
+        </button>
+        <button
+          class="border border-white px-6 py-2 rounded-full font-semibold hover:bg-white hover:text-blue-600 transition">
+          Escribir reseña
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="py-16 bg-white">
+    <div class="container mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+      <div class="bg-blue-600 border rounded-md text-white py-3">
+        <h3 class="text-3xl font-bold">10M+</h3>
+        <p>Reseñas publicadas</p>
+      </div>
+      <div class="bg-blue-600 border rounded-md text-white py-3">
+        <h3 class="text-3xl font-bold">50K+</h3>
+        <p>Productos evaluados</p>
+      </div>
+      <div class="bg-blue-600 border rounded-md text-white py-3">
+        <h3 class="text-3xl font-bold">5M+</h3>
+        <p>Usuarios activos</p>
+      </div >
+      <div class="bg-blue-600 border rounded-md text-white py-3">
+        <h3 class="text-3xl font-bold">100%</h3>
+        <p>Verificadas</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección de productos: Tecnología -->
+  <section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-2xl font-bold">Tecnología</h3>
+        <a href="#" class="text-blue-600 font-semibold">Ver más →</a>
+      </div>
+      <div class="flex gap-6 overflow-x-auto pb-4 scroll-smooth snap-x">
+        <div class="min-w-[250px] bg-white rounded-lg shadow p-4 snap-start" *ngFor="let t of products">
+          <img [src]="t.img" class="rounded mb-3" [alt]="t.img">
+          <h6 class="font-bold mb-1">{{ t.name }}</h6>
+          <div class="flex items-center mb-2">
+            <span class="text-yellow-400">★★★★★</span>
+            <small class="ml-2 text-gray-500">{{ t.rating }} ({{ t.reviews }})</small>
+          </div>
+          <button class="w-full bg-blue-600 text-white py-2 rounded-full hover:bg-blue-700 transition">
+            Ver detalles
+          </button>
         </div>
-    </nav>
-    <section class="hero text-white py-5 bg-primary">
-        <div class="container py-5">
-            <h1 class="display-4 fw-bold">
-                Descubre reseñas auténticas<br>
-                de productos
-            </h1>
-            <p class="lead mt-3">
-                Más de 10 millones de opiniones verificadas para ayudarte
-                a tomar la mejor decisión de compra.
-            </p>
-            <div class="mt-4">
-                <button class="btn btn-light me-3 rounded-pill px-4">
-                    Explorar categorías
-                </button>
-                <button class="btn btn-outline-light rounded-pill px-4">
-                    Escribir reseña
-                </button>
-            </div>
-        </div>
-    </section>
+      </div>
+    </div>
+  </section>
 
-
-    <section class="stats py-5 bg-white">
-        <div class="container text-center">
-            <div class="row g-4">
-                <div class="col-md-3">
-                    <h3 class="fw-bold">10M+</h3>
-                    <p>Reseñas publicadas</p>
-                </div>
-                <div class="col-md-3">
-                    <h3 class="fw-bold">50K+</h3>
-                    <p>Productos evaluados</p>
-                </div>
-                <div class="col-md-3">
-                    <h3 class="fw-bold">5M+</h3>
-                    <p>Usuarios activos</p>
-                </div>
-                <div class="col-md-3">
-                    <h3 class="fw-bold">100%</h3>
-                    <p>Verificadas</p>
-                </div>
-            </div>
+  <!-- Sección de productos: Juegos -->
+  <section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-2xl font-bold">Juegos</h3>
+        <a href="#" class="text-blue-600 font-semibold">Ver más →</a>
+      </div>
+      <div class="flex gap-6 overflow-x-auto pb-4 scroll-smooth snap-x">
+        <div class="min-w-[250px] bg-white rounded-lg shadow p-4 snap-start" *ngFor="let j of juegos">
+          <img [src]="j.img" class="rounded mb-3" [alt]="j.titulo">
+          <h6 class="font-bold mb-1">{{ j.titulo }}</h6>
+          <small class="text-gray-500">{{ j.reviews }} reseñas</small>
+          <div>⭐ {{ j.rating }}</div>
+          <button class="w-full bg-blue-600 text-white py-2 mt-2 rounded-full hover:bg-blue-700 transition">
+            Ver detalles
+          </button>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
 
-    <section class="py-5 bg-light">
-        <div class="container">
-            <div class="d-flex justify-content-between mb-4">
-                <h3 class="fw-bold">Tecnología</h3>
-                <a href="#">Ver más →</a>
-            </div>
-            <div class="row g-4 overflow-auto pb-2 flex-nowrap" id="productsContainer">
-                <div class="row">
-                    <div class="col-md-3" *ngFor="let p of products">
-                        <div class="card product-card shadow-sm h-100">
-                            <img [src]="p.img" class="card-img-top">
-                            <div class="card-body">
-                                <h6 class="fw-bold">{{ p.name }}</h6>
-                                <div class="mb-2">
-                                    <span class="star">★★★★★</span>
-                                    <small>{{ p.rating }} ({{ p.reviews }})</small>
-                                </div>
-                                <button class="btn btn-primary w-100 rounded-pill">
-                                    Ver reseñas
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <!-- Sección de productos: Libros -->
+  <section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-2xl font-bold">Libros</h3>
+        <a href="#" class="text-blue-600 font-semibold">Ver más →</a>
+      </div>
+      <div class="flex gap-6 overflow-x-auto pb-4 scroll-smooth snap-x">
+        <div class="min-w-[250px] bg-white rounded-lg shadow p-4 snap-start" *ngFor="let l of libros">
+          <img [src]="l.img" class="rounded mb-3" [alt]="l.titulo">
+          <h6 class="font-bold mb-1">{{ l.titulo }}</h6>
+          <small class="text-gray-500">{{ l.autor }}</small>
+          <div>⭐ {{ l.rating }}</div>
+          <button class="w-full bg-blue-600 text-white py-2 mt-2 rounded-full hover:bg-blue-700 transition">
+            Ver detalles
+          </button>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
 
-    <section class="py-5 bg-light">
-        <div class="container">
-            <div class="d-flex justify-content-between mb-4">
-                <h3 class="fw-bold">Juegos</h3>
-                <a href="#">Ver más →</a>
-            </div>
-            <div class="d-flex overflow-auto gap-4 flex-nowrap pb-2">
-                <div class="card product-card shadow-sm" style="min-width: 250px;" *ngFor="let j of juegos">
-                    <img [src]="j.img" class="card-img-top" [alt]="j.titulo">
-                    <div class="card-body d-flex flex-column">
-                        <h6 class="fw-bold">{{ j.titulo }}</h6>
-                        <small class="text-muted">{{ j.reviews }}</small>
-                        ⭐ {{ j.rating }}
-                        <button class="btn btn-primary rounded-pill mt-auto">
-                            Ver detalles
-                        </button>
-                    </div>
-                </div>
-            </div>
+  <!-- Sección de productos: Electrónica -->
+  <section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-2xl font-bold">Electrónica</h3>
+        <a href="#" class="text-blue-600 font-semibold">Ver más →</a>
+      </div>
+      <div class="flex gap-6 overflow-x-auto pb-4 scroll-smooth snap-x">
+        <div class="min-w-[250px] bg-white rounded-lg shadow p-4 snap-start" *ngFor="let e of products">
+          <img [src]="e.img" class="rounded mb-3" [alt]="e.img">
+          <h6 class="font-bold mb-1">{{ e.name }}</h6>
+          <div class="flex items-center mb-2">
+            <span class="text-yellow-400">★★★★★</span>
+            <small class="ml-2 text-gray-500">{{ e.rating }} ({{ e.reviews }})</small>
+          </div>
+          <button class="w-full bg-blue-600 text-white py-2 rounded-full hover:bg-blue-700 transition">
+            Ver detalles
+          </button>
         </div>
-    </section>
-    <section class="py-5">
-        <div class="container">
-            <div class="d-flex justify-content-between mb-4">
-                <h3 class="fw-bold">Libros</h3>
-                <a href="#">Ver más →</a>
-            </div>
-            <div class="d-flex overflow-auto gap-4 flex-nowrap pb-2">
-                <div class="card product-card shadow-sm" style="min-width: 250px;" *ngFor="let l of libros">
-                    <img [src]="l.img" class="card-img-top" [alt]="l.titulo">
-                    <div class="card-body d-flex flex-column">
-                        <h6 class="fw-bold">{{ l.titulo }}</h6>
-                        <small class="text-muted">{{ l.autor }}</small>
-                        ⭐ {{ l.rating }}
-                        <button class="btn btn-primary rounded-pill mt-auto">
-                            Ver detalles
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-3 mb-4">
-                    <h5>Sobre nosotros</h5>
-                    <p style="font-size:14px;">
-                        Reviewmeter es tu plataforma de confianza para descubrir opiniones auténticas sobre productos.
-                        Ayudamos a millones de usuarios a tomar mejores decisiones de compra.
-                    </p>
-                    <div class="brand-box">
-                        <div class="brand-icon">R</div>
-                        <strong class="text-white">Reviewmeter</strong>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-4">
-                    <h5>Políticas</h5>
-                    <a href="#">Política de Privacidad</a>
-                    <a href="#">Términos y Condiciones</a>
-                    <a href="#">Política de Cookies</a>
-                    <a href="#">Normas de la comunidad</a>
-                    <a href="#">Directrices de reseñas</a>
-                </div>
-                <div class="col-md-3 mb-4">
-                    <h5>Contacto</h5>
-                    <a href="#">Centro de ayuda</a>
-                    <a href="#">Soporte técnico</a>
-                    <a href="#"><i class="bi bi-envelope me-2"></i>contacto@reviewhub.com</a>
-                    <a href="#">Para empresas</a>
-                    <a href="#">Trabaja con nosotros</a>
-                </div>
-                <div class="col-md-3 mb-4">
-                    <h5>Síguenos</h5>
-                    <p style="font-size:14px;">
-                        Mantente al día con las últimas novedades y reseñas.
-                    </p>
-                    <div class="social-icons">
-                        <a href="#"><i class="bi bi-facebook"></i></a>
-                        <a href="#"><i class="bi bi-twitter"></i></a>
-                        <a href="#"><i class="bi bi-instagram"></i></a>
-                        <a href="#"><i class="bi bi-linkedin"></i></a>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom d-flex flex-column flex-md-row justify-content-between align-items-center">
-                <div>
-                    © 2026 ReviewHub. Todos los derechos reservados.
-                </div>
-                <div>
-                    <a href="#">Accesibilidad</a>
-                    <a href="#">Mapa del sitio</a>
-                    <a href="#">Legal</a>
-                </div>
-            </div>
+      </div>
+    </div>
+  </section>
 
+  <!-- Sección de productos: Moda -->
+  <section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-2xl font-bold">Moda</h3>
+        <a href="#" class="text-blue-600 font-semibold">Ver más →</a>
+      </div>
+      <div class="flex gap-6 overflow-x-auto pb-4 scroll-smooth snap-x">
+        <div class="min-w-[250px] bg-white rounded-lg shadow p-4 snap-start" *ngFor="let m of products">
+          <img [src]="m.img" class="rounded mb-3" [alt]="m.img">
+          <h6 class="font-bold mb-1">{{ m.name }}</h6>
+          <small class="text-gray-500">{{ m.rating }}</small>
+          <div>⭐ {{ m.rating }}</div>
+          <button class="w-full bg-blue-600 text-white py-2 mt-2 rounded-full hover:bg-blue-700 transition">
+            Ver detalles
+          </button>
         </div>
-    </footer>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="home.ts"></script>
-</body>
+      </div>
+    </div>
+  </section>
 
-</html>
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-12">
+    <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div>
+        <h5 class="font-bold mb-3">Sobre nosotros</h5>
+        <p class="text-sm">Reviewmeter es tu plataforma de confianza para descubrir opiniones auténticas sobre productos.
+          Ayudamos a millones de usuarios a tomar mejores decisiones de compra.</p>
+      </div>
+      <div>
+        <h5 class="font-bold mb-3">Políticas</h5>
+        <ul class="space-y-1 text-sm">
+          <li><a href="#" class="hover:text-gray-300">Política de Privacidad</a></li>
+          <li><a href="#" class="hover:text-gray-300">Términos y Condiciones</a></li>
+          <li><a href="#" class="hover:text-gray-300">Política de Cookies</a></li>
+          <li><a href="#" class="hover:text-gray-300">Normas de la comunidad</a></li>
+          <li><a href="#" class="hover:text-gray-300">Directrices de reseñas</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5 class="font-bold mb-3">Contacto</h5>
+        <ul class="space-y-1 text-sm">
+          <li><a href="#" class="hover:text-gray-300">Centro de ayuda</a></li>
+          <li><a href="#" class="hover:text-gray-300">Soporte técnico</a></li>
+          <li><a href="#" class="hover:text-gray-300"><i class="bi bi-envelope me-2"></i> contacto@reviewhub.com</a></li>
+          <li><a href="#" class="hover:text-gray-300">Para empresas</a></li>
+          <li><a href="#" class="hover:text-gray-300">Trabaja con nosotros</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5 class="font-bold mb-3">Síguenos</h5>
+        <p class="text-sm mb-2">Mantente al día con las últimas novedades y reseñas.</p>
+        <div class="flex gap-2 text-xl">
+          <a href="#" class="hover:text-blue-400"><i class="bi bi-facebook"></i></a>
+          <a href="#" class="hover:text-blue-400"><i class="bi bi-twitter"></i></a>
+          <a href="#" class="hover:text-pink-400"><i class="bi bi-instagram"></i></a>
+          <a href="#" class="hover:text-blue-600"><i class="bi bi-linkedin"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="mt-8 border-t border-gray-700 pt-4 text-sm text-gray-400 flex flex-col md:flex-row justify-between">
+      <span>© 2026 ReviewHub. Todos los derechos reservados.</span>
+      <span class="mt-2 md:mt-0 flex gap-4">
+        <a href="#" class="hover:text-gray-300">Accesibilidad</a>
+        <a href="#" class="hover:text-gray-300">Mapa del sitio</a>
+        <a href="#" class="hover:text-gray-300">Legal</a>
+      </span>
+    </div>
+  </footer>
+</div>

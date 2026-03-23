@@ -44,7 +44,7 @@ public class categoriaServiceImp implements categoriaService {
         categoriaExistente.setNombre(categoria.getNombre());
         categoriaExistente.setDescripcion(categoria.getDescripcion());
         
-        categoriaRepository.save(categoria);
+        categoriaRepository.save(categoriaExistente);
         return "Categoría actualizada correctamente";
     }
 

@@ -108,6 +108,98 @@ public class DataInitializer implements CommandLineRunner {
         hogar.setNombre("Hogar");
         categoriaRepository.save(hogar);
 
+        Categoria juegos = new Categoria();
+        juegos.setNombre("Juegos");
+        categoriaRepository.save(juegos);
+
+        Categoria tecnologia = new Categoria();
+        tecnologia.setNombre("Tecnología");
+        categoriaRepository.save(tecnologia);
+
+        Categoria libros = new Categoria();
+        libros.setNombre("Libros");
+        categoriaRepository.save(libros);
+
+        Categoria musica = new Categoria();
+        musica.setNombre("Música");
+        categoriaRepository.save(musica);
+
+        Categoria deportes = new Categoria();
+        deportes.setNombre("Deportes");
+        categoriaRepository.save(deportes);
+
+        Categoria comida = new Categoria();
+        comida.setNombre("Comida");
+        categoriaRepository.save(comida);
+
+        Categoria ropa = new Categoria();
+        ropa.setNombre("Ropa");
+        categoriaRepository.save(ropa);
+
+        Categoria belleza = new Categoria();
+        belleza.setNombre("Belleza");
+        categoriaRepository.save(belleza);
+
+        Categoria juguetes = new Categoria();
+        juguetes.setNombre("Juguetes");
+        categoriaRepository.save(juguetes);
+
+        Categoria cine = new Categoria();
+        cine.setNombre("Cine");
+        categoriaRepository.save(cine);
+
+        Categoria fotografia = new Categoria();
+        fotografia.setNombre("Fotografía");
+        categoriaRepository.save(fotografia);
+
+        Categoria bricolaje = new Categoria();
+        bricolaje.setNombre("Bricolaje");
+        categoriaRepository.save(bricolaje);
+
+        Categoria herramientas = new Categoria();
+        herramientas.setNombre("Herramientas");
+        categoriaRepository.save(herramientas);
+
+        Categoria viajes = new Categoria();
+        viajes.setNombre("Viajes");
+        categoriaRepository.save(viajes);
+
+        Categoria animales = new Categoria();
+        animales.setNombre("Animales");
+        categoriaRepository.save(animales);
+
+        Categoria salud = new Categoria();
+        salud.setNombre("Salud");
+        categoriaRepository.save(salud);
+
+        Categoria coches = new Categoria();
+        coches.setNombre("Coches");
+        categoriaRepository.save(coches);
+
+        Categoria videojuegos = new Categoria();
+        videojuegos.setNombre("Videojuegos");
+        categoriaRepository.save(videojuegos);
+
+        Categoria educacion = new Categoria();
+        educacion.setNombre("Educación");
+        categoriaRepository.save(educacion);
+
+        Categoria instrumentos = new Categoria();
+        instrumentos.setNombre("Instrumentos musicales");
+        categoriaRepository.save(instrumentos);
+
+        Categoria electrónica = new Categoria();
+        electrónica.setNombre("Electrónica");
+        categoriaRepository.save(electrónica);
+
+        Categoria jardineria = new Categoria();
+        jardineria.setNombre("Jardinería");
+        categoriaRepository.save(jardineria);
+
+        Categoria moda = new Categoria();
+        moda.setNombre("Moda");
+        categoriaRepository.save(moda);
+        
         List<Categoria> categorias = categoriaRepository.findAll();
 
         // ==========================

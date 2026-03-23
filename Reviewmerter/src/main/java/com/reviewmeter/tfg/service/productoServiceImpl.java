@@ -57,4 +57,9 @@ public class productoServiceImpl implements productoService {
         productoRepository.delete(producto);
         return "Producto eliminado correctamente";
     }
+    
+    @Override
+    public List<Producto> getProductosPorCategoria(Long idCategoria) {
+        return productoRepository.findByCategoria_IdCategoria(idCategoria);
+    }
 }

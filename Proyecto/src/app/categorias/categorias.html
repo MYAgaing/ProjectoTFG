@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ReviewHub | Reviewmeter</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="text-white bg-blue-500">
+
+  <!-- NAVBAR -->
+  <nav class="bg-blue-950/80 backdrop-blur-lg shadow sticky top-0 z-50">
+    <div class="container mx-auto flex items-center justify-between p-4">
+      <a href="#" class="flex items-center text-white font-bold text-xl">
+        <span class="bg-blue-500 text-white rounded-full px-3 py-1 mr-3 text-2xl">R</span>
+        Reviewmeter
+      </a>
+      <div class="flex items-center gap-3">
+        <a href="#categories" class="text-white hover:text-blue-200 transition">Categorías</a>
+        <button routerLink="/login"
+          class="px-4 py-2 border border-white text-white rounded-full hover:bg-white hover:text-blue-950 transition">
+          <i class="bi bi-person"></i> Iniciar sesión
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ESTADÍSTICAS -->
+  <section class="py-16">
+    <div class="container mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-center">
+      <div class="bg-blue-800/70 backdrop-blur-md shadow rounded-xl p-6">
+        <h4 class="text-2xl font-bold">10M+</h4>
+        <p class="text-blue-200">Reseñas publicadas</p>
+      </div>
+      <div class="bg-blue-800/70 backdrop-blur-md shadow rounded-xl p-6">
+        <h4 class="text-2xl font-bold">50K+</h4>
+        <p class="text-blue-200">Productos evaluados</p>
+      </div>
+      <div class="bg-blue-800/70 backdrop-blur-md shadow rounded-xl p-6">
+        <h4 class="text-2xl font-bold">5M+</h4>
+        <p class="text-blue-200">Usuarios activos</p>
+      </div>
+      <div class="bg-blue-800/70 backdrop-blur-md shadow rounded-xl p-6">
+        <h4 class="text-2xl font-bold">100%</h4>
+        <p class="text-blue-200">Verificadas</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORÍAS -->
+  <section class="py-16">
+    <div class="container mx-auto">
+      <h3 class="text-3xl font-bold mb-8 text-center">Categorías</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <a *ngFor="let categoria of categorias"
+          class="block bg-blue-800/70 backdrop-blur-md shadow rounded-lg overflow-hidden hover:scale-105 transition-transform">
+          <img src="" class="w-full h-40 object-cover">
+          <div class="p-3 text-center">
+            <h6 class="text-white font-bold">{{ categoria.nombre }}</h6>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-blue-950 text-blue-200 py-6 mt-10 text-center">
+    © 2026 Reviewmeter. Todos los derechos reservados.
+  </footer>
+
+</body>
+
+</html>
