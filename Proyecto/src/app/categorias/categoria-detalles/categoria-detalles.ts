@@ -1,29 +1,45 @@
+import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { Producto } from '../../Model/productoModel.model';
+import { Servicios } from '../../Services/servicios';
+
 
 @Component({
   selector: 'app-categoria-detalles',
-  imports: [],
+  imports: [CommonModule,RouterLink],
   templateUrl: './categoria-detalles.html',
   styleUrl: './categoria-detalles.css',
 })
 export class CategoriaDetalles implements OnInit{
 
-  productos: any[] = [];
+  productos: Producto[] = [];
   categoriaNombre: string = '';
+  producto: any;
+  rese: any;
+  relacionados: any;
 
-  constructor(private route: ActivatedRoute, private http: HttpClient) {}
+  constructor(
+    private route: ActivatedRoute,
+    private s: Servicios,
+  ) {}
 
   ngOnInit(): void {
-    const idCategoria = this.route.snapshot.paramMap.get('id');
+
+    const idCategoria = Number(this.route.snapshot.paramMap.get('id'));
     const nombre = this.route.snapshot.paramMap.get('nombre');
+
+    this.categoriaNombre = nombre || '';
+
     if (idCategoria) {
-      this.categoriaNombre = nombre || '';
-      this.http.get<any[]>(`http://localhost:8080/api/productos/categoria/${idCategoria}`)
+      this.s.getProductosPorCategoria(idCategoria)
         .subscribe({
-          next: data => this.productos = data,
-          error: err => console.error('Error cargando productos', err)
+          next: (data) => {
+           this.productos = data, 
+           console.log(data)
+          },
+          error: (err) => console.error('Error cargando productos', err)
         });
     }
   }

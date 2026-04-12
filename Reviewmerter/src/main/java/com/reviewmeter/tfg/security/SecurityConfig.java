@@ -42,6 +42,8 @@ public class SecurityConfig {
                     .requestMatchers("/usuario/me").hasAnyRole("USER","ADMIN")
                     // Categorias
                     .requestMatchers("/api/categorias/**").permitAll()
+                    // Productos
+                    .requestMatchers("/api/productos/**").permitAll()
                     // Resto protegido
                     .anyRequest().authenticated()
             );

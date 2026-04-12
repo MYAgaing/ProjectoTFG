@@ -12,6 +12,6 @@ export const routes: Routes = [
     { path: 'register', component: Registro },
     { path: 'profile', component: UserProfile },
     { path: 'categorias', component: Categorias },
-    { path: 'categoria-detalle', component: CategoriaDetalles},
+    { path: 'categoria/:id/:nombre', component: CategoriaDetalles },
     { path: '**', redirectTo: '' }
 ];

@@ -2,10 +2,11 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { Categoria } from '../Model/categoriaModel.model';
 import { Servicios } from '../Services/servicios';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-categorias',
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './categorias.html',
   styleUrl: './categorias.css',
 })
