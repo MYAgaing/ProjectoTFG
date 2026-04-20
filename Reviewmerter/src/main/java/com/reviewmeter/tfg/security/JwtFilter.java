@@ -34,40 +34,37 @@ public class JwtFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 	        throws ServletException, IOException {
 
-	    // ⚡ Ignorar login y register
-	    String path = request.getRequestURI();
-	    if (path.equals("/auth/login") || path.equals("/auth/register")) {
-	        filterChain.doFilter(request, response); // deja pasar
-	        return;
-	    }
-
 	    // 1️⃣ Leer header Authorization
 	    String header = request.getHeader("Authorization");
 
-	    if (header != null && header.startsWith("Bearer ")) {
-	        String token = header.substring(7); // quitar "Bearer "
-
-	        try {
-	            // 2️⃣ Extraer email del token
-	            String email = jwtService.extractEmail(token);
-
-	            // 3️⃣ Cargar usuario desde BD
-	            UserDetails user = userDetailsService.loadUserByUsername(email);
-
-	            // 4️⃣ Crear autenticación para Spring Security
-	            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, null,
-	                    user.getAuthorities());
-
-	            // 5️⃣ Poner en SecurityContext
-	            SecurityContextHolder.getContext().setAuthentication(auth);
-
-	        } catch (Exception e) {
-	            // Token inválido o expirado
-	            System.out.println("Token no válido: " + e.getMessage());
-	        }
+	    // ⚡ CAMBIO CLAVE: Si no hay token o no es Bearer, 
+	    // pasamos al siguiente filtro y SALIMOS de este.
+	    if (header == null || !header.startsWith("Bearer ")) {
+	        filterChain.doFilter(request, response);
+	        return; // <--- MUY IMPORTANTE: Evita ejecutar el resto del código
 	    }
 
-	    // 6️⃣ Continuar con la cadena de filtros
+	    // 2️⃣ Si llegamos aquí, es que hay un token. Intentamos validarlo.
+	    try {
+	        String token = header.substring(7);
+	        String email = jwtService.extractEmail(token);
+
+	        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+	            UserDetails user = userDetailsService.loadUserByUsername(email);
+
+	            // Validar si el token es correcto (puedes añadir aquí jwtService.isTokenValid)
+	            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+	                    user, null, user.getAuthorities());
+	            
+	            SecurityContextHolder.getContext().setAuthentication(auth);
+	        }
+	    } catch (Exception e) {
+	        // Si el token falla en una ruta PROTEGIDA, Spring dará 403.
+	        // Si falla en una ruta PÚBLICA, no pasa nada porque ya llamamos a doFilter arriba.
+	        System.out.println("Error procesando JWT: " + e.getMessage());
+	    }
+
+	    // 3️⃣ Continuar con la cadena
 	    filterChain.doFilter(request, response);
 	}
 

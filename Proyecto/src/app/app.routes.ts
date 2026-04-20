@@ -5,6 +5,7 @@ import { Home } from './home/home';
 import { UserProfile } from './user-profile/user-profile';
 import { Categorias } from './categorias/categorias';
 import { CategoriaDetalles } from './categorias/categoria-detalles/categoria-detalles';
+import { ProductoDetalle } from './producto-detalle/producto-detalle';
 
 export const routes: Routes = [
     { path: '', component: Home },
@@ -13,5 +14,6 @@ export const routes: Routes = [
     { path: 'profile', component: UserProfile },
     { path: 'categorias', component: Categorias },
     { path: 'categoria/:id/:nombre', component: CategoriaDetalles },
+    { path: 'producto/:id', component: ProductoDetalle },
     { path: '**', redirectTo: '' }
 ];

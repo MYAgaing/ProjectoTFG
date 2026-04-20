@@ -75,5 +75,10 @@ public class resenaServiceImpl implements resenaService {
 	public List<Resena> ordenarPorPuntuacionAsc() {
 		return resenaRepository.findAllByOrderByPuntuacionAsc();
 	}
+	
+	@Override
+	public List<Resena> getResenasPorProducto(Long idProducto) {
+	    return resenaRepository.findByProducto_IdProducto(idProducto);
+	}
 
 }

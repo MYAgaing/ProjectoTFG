@@ -7,4 +7,6 @@ export interface Producto {
   marca: string;
   fechaLanzamiento: string;
   categoria: Categoria;
+  imageUrl:string;
+  valoracion:number;
 }

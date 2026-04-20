@@ -16,5 +16,7 @@ public interface resenaRepository extends JpaRepository<Resena, Long>{
     List<Resena> findAllByOrderByPuntuacionDesc();
 
     List<Resena> findAllByOrderByPuntuacionAsc();
+    
+    List<Resena> findByProducto_IdProducto(Long idProducto);
 
 }

@@ -22,6 +22,8 @@ public class Producto {
     private String descripcion;
     private String marca;
     private LocalDate fechaLanzamiento;
+    private Integer valoracion;
+    private String imageUrl;
 
     @ManyToOne
     @JoinColumn(name = "id_categoria", nullable = false)
@@ -73,6 +75,23 @@ public class Producto {
 
 	public void setCategoria(Categoria categoria) {
 		this.categoria = categoria;
+	}
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+
+
+	public Integer getValoracion() {
+		return valoracion;
+	}
+
+	public void setValoracion(Integer valoracion) {
+		this.valoracion = valoracion;
 	}
     
 }

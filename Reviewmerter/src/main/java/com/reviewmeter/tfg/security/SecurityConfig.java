@@ -1,11 +1,12 @@
 package com.reviewmeter.tfg.security;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod; // Importante para definir métodos
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -22,53 +23,59 @@ public class SecurityConfig {
     @Autowired
     private JwtFilter jwtFilter;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-            .csrf(csrf -> csrf.disable()) // Deshabilitar CSRF porque es API REST
-            .cors(cors -> {}) // ⚡ habilitar CORS usando el bean CorsConfigurationSource
+            .csrf(csrf -> csrf.disable()) 
+            // 1. Configuramos CORS explícitamente usando nuestro bean
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session ->
-                    session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Stateless JWT
+                    session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
+            		.requestMatchers("/error").permitAll()
+                    // Permitir preflight (OPTIONS) para evitar bloqueos CORS
+                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                    
                     // Endpoints públicos
-                    .requestMatchers("/auth/login","/auth/register").permitAll()
+                    .requestMatchers("/auth/**").permitAll()
+                    
+                    // Categorias, Productos y Reseñas (Lectura pública)
+                    .requestMatchers(HttpMethod.GET, "/api/categorias/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/resenas/**").permitAll()
+                    
                     // Admin
                     .requestMatchers("/admin/**").hasRole("ADMIN")
+                    
                     // Usuario logueado
-                    .requestMatchers("/usuario/me").hasAnyRole("USER","ADMIN")
-                    // Categorias
-                    .requestMatchers("/api/categorias/**").permitAll()
-                    // Productos
-                    .requestMatchers("/api/productos/**").permitAll()
-                    // Resto protegido
+                    .requestMatchers("/usuario/me").hasAnyRole("USER", "ADMIN")
+                    
+                    // El resto de peticiones (POST, PUT, DELETE) requieren auth
                     .anyRequest().authenticated()
             );
 
-        // Añadir JwtFilter antes del filtro de Spring Security
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    // Bean para AuthenticationManager (si necesitas inyectarlo)
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
 
-    // ⚡ Bean CORS global: para permitir Angular
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200")); // tu Angular
-        configuration.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
+        // Asegúrate de que esta URL es EXACTAMENTE la de tu Angular (sin / al final)
+        configuration.setAllowedOrigins(List.of("http://localhost:4200")); 
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept"));
         configuration.setAllowCredentials(true);
+        // Tiempo que el navegador guarda la configuración CORS (opcional)
+        configuration.setMaxAge(3600L); 
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

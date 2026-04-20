@@ -1,53 +1,90 @@
-<!DOCTYPE html>
-<html lang="es">
+<div class="min-h-screen bg-gray-50 flex flex-col">
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ReviewHub | Reviewmeter</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-
-<body class="text-white bg-blue-500">
-
-  <!-- NAVBAR -->
-  <nav class="bg-blue-950/80 backdrop-blur-lg shadow sticky top-0 z-50">
-    <div class="container mx-auto flex items-center justify-between p-4">
-      <a href="#" class="flex items-center text-white font-bold text-xl">
-        <span class="bg-blue-500 text-white rounded-full px-3 py-1 mr-3 text-2xl">R</span>
-        Reviewmeter
+  <nav class="sticky top-0 bg-white shadow py-3 z-50">
+    <div class="container mx-auto px-4 flex items-center justify-between">
+      <a routerLink="/" class="flex items-center space-x-3 hover:opacity-90 transition">
+        <span class="bg-blue-600 text-white text-2xl font-bold px-3 py-2 rounded">R</span>
+        <span class="font-bold text-lg text-black">Reviewmeter</span>
       </a>
-      <div class="flex items-center gap-3">
-        <a href="#categories" class="text-white hover:text-blue-200 transition">Categorías</a>
-        <button routerLink="/login"
-          class="px-4 py-2 border border-white text-white rounded-full hover:bg-white hover:text-blue-950 transition">
-          <i class="bi bi-person"></i> Iniciar sesión
-        </button>
+      
+      <form class="flex-1 mx-8 hidden md:block">
+        <div class="relative">
+          <input type="search" placeholder="Buscar categorías..."
+            class="w-full border border-gray-300 rounded-full px-5 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+      </form>
+
+      <div class="flex items-center space-x-3">
+        <ng-container *ngIf="estaLogueado(); else loginBtn">
+          <button routerLink="/profile"
+            class="border border-blue-600 text-blue-600 px-5 py-2 rounded-full flex items-center gap-2 hover:bg-blue-50 transition font-medium">
+            <i class="bi bi-person-circle"></i> Perfil
+          </button>
+          <button (click)="logout()"
+            class="bg-red-500 text-white px-5 py-2 rounded-full flex items-center gap-2 hover:bg-red-600 transition font-medium">
+            <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+          </button>
+        </ng-container>
+        <ng-template #loginBtn>
+          <button routerLink="/login"
+            class="bg-blue-600 text-white px-5 py-2 rounded-full flex items-center gap-2 hover:bg-blue-700 transition font-medium">
+            <i class="bi bi-person"></i> Iniciar sesión
+          </button>
+        </ng-template>
       </div>
     </div>
   </nav>
 
-  <!-- CATEGORÍAS -->
-  <section class="py-16">
-    <div class="container mx-auto">
-      <h3 class="text-3xl font-bold mb-8 text-center">Categorías</h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        <a *ngFor="let c of categorias"
-         [routerLink]="['/categoria', c.idCategoria, c.nombre]"class="block bg-blue-800/70 backdrop-blur-md shadow rounded-lg overflow-hidden hover:scale-105 transition-transform">
-          <img src="" class="w-full h-40 object-cover">
-          <div class="p-3 text-center">
-            <h6 class="text-white font-bold">{{ c.nombre }}</h6>
+  <header class="bg-white border-b">
+    <div class="container mx-auto px-4 py-12 text-center">
+      <h1 class="text-4xl font-extrabold text-gray-900">Explorar Categorías</h1>
+      <p class="mt-3 text-gray-600 max-w-2xl mx-auto">
+        Encuentra las mejores reseñas organizadas por sector. Desde tecnología de punta hasta las últimas tendencias en moda.
+      </p>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-4 py-12 flex-grow">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+      
+      <div *ngFor="let c of categorias" 
+           [routerLink]="['/categoria', c.idCategoria, c.nombre]"
+           class="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer">
+        
+        <div class="relative h-48 overflow-hidden">
+          <img [src]="c.imageUrl || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=800'" 
+               class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+               [alt]="c.nombre">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
+        </div>
+
+        <div class="p-6">
+          <div class="flex justify-between items-start mb-2">
+            <h3 class="text-xl font-bold text-gray-800 group-hover:text-blue-600 transition-colors">
+              {{ c.nombre }}
+            </h3>
+            <i class="bi bi-arrow-right-short text-2xl text-blue-500 transform -rotate-45 group-hover:rotate-0 transition-transform"></i>
           </div>
-        </a>
+          <p class="text-gray-500 text-sm line-clamp-2">
+            {{ c.descripcion || 'Explora las mejores marcas y opiniones verificadas en ' + c.nombre + '.' }}
+          </p>
+        </div>
+
       </div>
     </div>
-  </section>
+  </main>
 
-  <!-- FOOTER -->
-  <footer class="bg-blue-950 text-blue-200 py-6 mt-10 text-center">
-    © 2026 Reviewmeter. Todos los derechos reservados.
+  <footer class="bg-gray-800 text-white py-10">
+    <div class="container mx-auto px-4 text-center">
+      <div class="flex justify-center items-center space-x-3 mb-4">
+        <span class="bg-blue-600 text-white text-xl font-bold px-2 py-1 rounded">R</span>
+        <span class="font-bold text-lg">Reviewmeter</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-6">Ayudándote a comprar con confianza desde 2026.</p>
+      <div class="border-t border-gray-700 pt-6 text-xs text-gray-500">
+        © 2026 Reviewmeter. Todos los derechos reservados.
+      </div>
+    </div>
   </footer>
 
-</body>
-
-</html>
+</div>

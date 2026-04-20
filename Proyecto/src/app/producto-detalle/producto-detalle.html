@@ -1,0 +1,124 @@
+<div class="min-h-screen bg-gray-50" *ngIf="product">
+
+  <nav class="sticky top-0 bg-white shadow py-3 z-50">
+    <div class="container mx-auto px-4 flex items-center justify-between">
+      <a routerLink="/" class="flex items-center space-x-3">
+        <span class="bg-blue-600 text-white text-2xl font-bold px-3 py-2 rounded">R</span>
+        <span class="font-bold text-lg">Reviewmeter</span>
+      </a>
+      <div class="flex-1 mx-8 hidden md:block">
+        <input type="search" placeholder="Buscar productos..." class="w-full border rounded-full px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+      </div>
+      <div class="flex items-center space-x-3">
+        <ng-container *ngIf="estaLogueado(); else loginBtn">
+          <button routerLink="/profile"
+            class="border border-blue-600 text-blue-600 px-5 py-2 rounded-full flex items-center gap-2 hover:bg-blue-50 transition font-medium">
+            <i class="bi bi-person-circle"></i> Perfil
+          </button>
+          <button (click)="logout()"
+            class="bg-red-500 text-white px-5 py-2 rounded-full flex items-center gap-2 hover:bg-red-600 transition font-medium">
+            <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+          </button>
+        </ng-container>
+        <ng-template #loginBtn>
+          <button routerLink="/login"
+            class="bg-blue-600 text-white px-5 py-2 rounded-full font-medium hover:bg-blue-700">Iniciar Sesión</button>
+        </ng-template>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mx-auto px-4 py-4 text-sm text-gray-500">
+    <span>Inicio</span> › 
+    <span class="text-blue-600">{{ product.categoria?.nombre }}</span> › 
+    <span class="text-gray-800 font-semibold">{{ product.nombre }}</span>
+  </div>
+
+  <main class="container mx-auto px-4 py-6">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="flex flex-col md:flex-row">
+        
+        <div class="md:w-1/2 bg-gray-50 p-8 flex items-center justify-center border-r border-gray-100">
+          <img [src]="product.imageUrl" [alt]="product.nombre" class="max-h-80 object-contain hover:scale-105 transition-transform duration-300">
+        </div>
+
+        <div class="md:w-1/2 p-8">
+          <div class="mb-4">
+            <span class="bg-blue-50 text-blue-600 text-xs font-bold px-3 py-1 rounded-full uppercase">{{ product.marca }}</span>
+            <h1 class="text-3xl font-extrabold text-gray-900 mt-2">{{ product.nombre }}</h1>
+          </div>
+
+          <div class="flex items-center gap-4 mb-6">
+            <div class="flex items-center bg-yellow-50 px-3 py-1 rounded-lg">
+              <span class="text-yellow-500 font-bold text-xl mr-1">★</span>
+              <span class="text-gray-800 font-bold text-lg">4.8</span>
+            </div>
+            <span class="text-gray-400 text-sm border-l pl-4">Lanzado el {{ product.fechaLanzamiento }}</span>
+          </div>
+
+          <div class="mb-8">
+            <h3 class="text-gray-900 font-bold mb-2">Descripción del producto</h3>
+            <p class="text-gray-600 leading-relaxed">{{ product.descripcion }}</p>
+          </div>
+
+          <div class="flex flex-wrap gap-4">
+            <button class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition">
+              Escribir Reseña
+            </button>
+            <button class="bg-white border border-gray-200 text-gray-700 px-8 py-3 rounded-xl font-bold hover:bg-gray-50 transition">
+              Añadir a favoritos
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12">
+      <div class="flex items-center justify-between mb-8">
+        <h2 class="text-2xl font-bold text-gray-900">Opiniones de la comunidad</h2>
+        <div class="flex gap-2">
+            <select class="border-gray-200 rounded-lg text-sm focus:ring-blue-500">
+                <option>Más recientes</option>
+                <option>Mejor puntuadas</option>
+            </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div *ngFor="let resena of listaResenas" class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+          <div class="flex justify-between items-start mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+                {{ resena.usuario?.nombre?.charAt(0) || 'U' }}
+              </div>
+              <div>
+                <h4 class="font-bold text-gray-900">{{ resena.usuario?.nombre }}</h4>
+                <p class="text-xs text-gray-400">{{ resena.fecha }}</p>
+              </div>
+            </div>
+            <div class="flex text-yellow-400">
+              <span *ngFor="let star of [1,2,3,4,5]">
+                {{ star <= resena.puntuacion ? '★' : '☆' }}
+              </span>
+            </div>
+          </div>
+
+          <h5 class="font-bold text-gray-800 mb-2">{{ resena.titulo }}</h5>
+          <p class="text-gray-600 text-sm leading-relaxed mb-4">
+            {{ resena.comentario }}
+          </p>
+          
+          <div class="flex items-center gap-4 pt-4 border-t border-gray-50">
+            <button class="text-gray-400 text-xs flex items-center gap-1 hover:text-blue-600">
+              <i class="bi bi-hand-thumbs-up"></i> ¿Es útil?
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="listaResenas?.length === 0" class="text-center py-20 bg-white rounded-2xl border-2 border-dashed border-gray-100">
+        <p class="text-gray-400">Este producto aún no tiene reseñas. ¡Sé el primero!</p>
+      </div>
+    </div>
+  </main>
+</div>

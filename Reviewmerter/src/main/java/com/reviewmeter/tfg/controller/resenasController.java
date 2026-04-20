@@ -74,4 +74,9 @@ public class resenasController {
 	public ResponseEntity<List<Resena>> peoresValoradas() {
 		return ResponseEntity.ok(resenaService.ordenarPorPuntuacionAsc());
 	}
+	
+	@GetMapping("/producto/{id}")
+	public List<Resena> listarPorProducto(@PathVariable Long id) {
+	    return resenaService.getResenasPorProducto(id);
+	}
 }

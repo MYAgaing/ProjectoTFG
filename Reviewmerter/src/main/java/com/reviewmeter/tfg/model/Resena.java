@@ -55,14 +55,6 @@ public class Resena {
 		this.comentario = comentario;
 	}
 
-	public Integer getPuntuacion() {
-		return puntuacion;
-	}
-
-	public void setPuntuacion(Integer puntuacion) {
-		this.puntuacion = puntuacion;
-	}
-
 	public LocalDate getFecha() {
 		return fecha;
 	}
@@ -85,5 +77,13 @@ public class Resena {
 
 	public void setProducto(Producto producto) {
 		this.producto = producto;
+	}
+
+	public Integer getPuntuacion() {
+		return puntuacion;
+	}
+
+	public void setPuntuacion(Integer puntuacion) {
+		this.puntuacion = puntuacion;
 	}
 }

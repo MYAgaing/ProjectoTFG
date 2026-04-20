@@ -8,15 +8,52 @@
         <span class="bg-blue-600 text-white text-2xl font-bold px-3 py-2 rounded">R</span>
         <span class="font-bold text-lg text-black">Reviewmeter</span>
       </a>
-      <form class="flex-1 mx-4">
-        <input type="search" placeholder="Buscar productos, marcas o categorías..."
-          class="w-full border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <form class="flex-1 mx-4 relative" (submit)="$event.preventDefault()">
+        <input
+          type="search"
+          placeholder="Buscar productos, marcas o categorías..."
+          class="w-full border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          name="busqueda"
+          [(ngModel)]="terminoBusqueda"
+          (input)="buscar()"
+          (blur)="cerrarDropdown()"
+        >
+        <!-- Dropdown resultados -->
+        <div *ngIf="mostrarDropdown && resultadosBusqueda.length > 0"
+             class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
+          <div *ngFor="let p of resultadosBusqueda"
+               (mousedown)="irAProducto(p)"
+               class="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-0">
+            <img [src]="p.imageUrl" [alt]="p.nombre" class="w-20 h-20 object-contain rounded">
+            <div>
+              <p class="font-semibold text-gray-800 text-2xl">{{ p.nombre }}</p>
+              <p class="text-2xl text-gray-400">{{ p.marca }} · {{ p.categoria?.nombre }}</p>
+            </div>
+          </div>
+        </div>
+        <!-- Sin resultados -->
+        <div *ngIf="mostrarDropdown && resultadosBusqueda.length === 0 && terminoBusqueda.length > 0"
+             class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 px-4 py-3 text-sm text-gray-500">
+          No se encontraron productos para "{{ terminoBusqueda }}"
+        </div>
       </form>
       <div class="flex items-center space-x-3">
-        <button routerLink="/login"
-          class="bg-blue-600 text-white px-4 py-2 rounded-full flex items-center gap-2 hover:bg-blue-700 transition">
-          <i class="bi bi-person"></i> Iniciar sesión
-        </button>
+        <ng-container *ngIf="estaLogueado(); else loginBtn">
+          <button routerLink="/profile"
+            class="border border-blue-600 text-blue-600 px-4 py-2 rounded-full flex items-center gap-2 hover:bg-blue-50 transition">
+            <i class="bi bi-person-circle"></i> Perfil
+          </button>
+          <button (click)="logout()"
+            class="bg-red-500 text-white px-4 py-2 rounded-full flex items-center gap-2 hover:bg-red-600 transition">
+            <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+          </button>
+        </ng-container>
+        <ng-template #loginBtn>
+          <button routerLink="/login"
+            class="bg-blue-600 text-white px-4 py-2 rounded-full flex items-center gap-2 hover:bg-blue-700 transition">
+            <i class="bi bi-person"></i> Iniciar sesión
+          </button>
+        </ng-template>
       </div>
     </div>
   </nav>
@@ -25,9 +62,11 @@
   <section class="bg-blue-600 text-white py-20">
     <div class="container mx-auto px-4">
       <h1 class="text-4xl md:text-5xl font-bold leading-tight">Descubre reseñas auténticas<br>de productos</h1>
-      <p class="mt-4 text-lg md:text-xl">Más de 10 millones de opiniones verificadas para ayudarte a tomar la mejor decisión de compra.</p>
+      <p class="mt-4 text-lg md:text-xl">Más de 10 millones de opiniones verificadas para ayudarte a tomar la mejor
+        decisión de compra.</p>
       <div class="mt-6 flex flex-wrap gap-4">
-        <button routerLink="/categorias" class="bg-white text-blue-600 px-8 py-3 rounded-full font-semibold hover:bg-blue-400 transition">
+        <button routerLink="/categorias"
+          class="bg-white text-blue-600 px-8 py-3 rounded-full font-semibold hover:bg-blue-400 transition">
           Explorar categorías
         </button>
       </div>
@@ -48,7 +87,7 @@
       <div class="bg-blue-600 border rounded-md text-white py-3">
         <h3 class="text-3xl font-bold">5M+</h3>
         <p>Usuarios activos</p>
-      </div >
+      </div>
       <div class="bg-blue-600 border rounded-md text-white py-3">
         <h3 class="text-3xl font-bold">100%</h3>
         <p>Verificadas</p>
@@ -64,14 +103,17 @@
         <a href="#" class="text-blue-600 font-semibold">Ver más →</a>
       </div>
       <div class="flex gap-6 overflow-x-auto pb-4 scroll-smooth snap-x">
-        <div class="min-w-[250px] bg-white rounded-lg shadow p-4 snap-start" *ngFor="let t of products">
-          <img [src]="t.img" class="rounded mb-3" [alt]="t.img">
-          <h6 class="font-bold mb-1">{{ t.name }}</h6>
+        <div class="min-w-[250px] bg-white rounded-lg shadow p-4 snap-start" *ngFor="let t of listaTecnologia">
+          <img [src]="t.imageUrl" class="rounded mb-3 w-full h-48 object-cover" [alt]="t.imageUrl">
+          <h6 class="font-bold mb-1">{{ t.nombre }}</h6>
           <div class="flex items-center mb-2">
-            <span class="text-yellow-400">★★★★★</span>
-            <small class="ml-2 text-gray-500">{{ t.rating }} ({{ t.reviews }})</small>
+            <span *ngFor="let estrella of getEstrellas(t.valoracion)">
+              {{ estrella === 1 ? '★' : '☆' }}
+            </span>
+            <small class="ml-2 text-gray-500">{{ t.marca }} ({{ t.fechaLanzamiento }})</small>
           </div>
-          <button class="w-full bg-blue-600 text-white py-2 rounded-full hover:bg-blue-700 transition">
+          <button [routerLink]="['/producto', t.idProducto]"
+            class="w-full bg-blue-600 text-white py-2 rounded-full hover:bg-blue-700 transition">
             Ver detalles
           </button>
         </div>
@@ -87,11 +129,13 @@
         <a href="#" class="text-blue-600 font-semibold">Ver más →</a>
       </div>
       <div class="flex gap-6 overflow-x-auto pb-4 scroll-smooth snap-x">
-        <div class="min-w-[250px] bg-white rounded-lg shadow p-4 snap-start" *ngFor="let j of juegos">
-          <img [src]="j.img" class="rounded mb-3" [alt]="j.titulo">
-          <h6 class="font-bold mb-1">{{ j.titulo }}</h6>
-          <small class="text-gray-500">{{ j.reviews }} reseñas</small>
-          <div>⭐ {{ j.rating }}</div>
+        <div class="min-w-[250px] bg-white rounded-lg shadow p-4 snap-start" *ngFor="let j of listaJuegos">
+          <img [src]="j.imageUrl" class="rounded mb-3 w-full h-48 object-cover" [alt]="j.imageUrl">
+          <h6 class="font-bold mb-1">{{ j.nombre }}</h6>
+          <small class="text-gray-500">{{ j.marca }} reseñas</small>
+          <span *ngFor="let estrella of getEstrellas(j.valoracion)">
+            {{ estrella === 1 ? '★' : '☆' }}
+          </span>
           <button class="w-full bg-blue-600 text-white py-2 mt-2 rounded-full hover:bg-blue-700 transition">
             Ver detalles
           </button>
@@ -108,11 +152,13 @@
         <a href="#" class="text-blue-600 font-semibold">Ver más →</a>
       </div>
       <div class="flex gap-6 overflow-x-auto pb-4 scroll-smooth snap-x">
-        <div class="min-w-[250px] bg-white rounded-lg shadow p-4 snap-start" *ngFor="let l of libros">
-          <img [src]="l.img" class="rounded mb-3" [alt]="l.titulo">
-          <h6 class="font-bold mb-1">{{ l.titulo }}</h6>
-          <small class="text-gray-500">{{ l.autor }}</small>
-          <div>⭐ {{ l.rating }}</div>
+        <div class="min-w-[250px] bg-white rounded-lg shadow p-4 snap-start" *ngFor="let l of listaLibros">
+          <img [src]="l.imageUrl" class="rounded mb-3 w-full h-48 object-cover" [alt]="l.imageUrl">
+          <h6 class="font-bold mb-1">{{ l.nombre }}</h6>
+          <small class="text-gray-500">{{ l.marca }}</small>
+          <span *ngFor="let estrella of getEstrellas(l.valoracion)">
+            {{ estrella === 1 ? '★' : '☆' }}
+          </span>
           <button class="w-full bg-blue-600 text-white py-2 mt-2 rounded-full hover:bg-blue-700 transition">
             Ver detalles
           </button>
@@ -129,12 +175,13 @@
         <a href="#" class="text-blue-600 font-semibold">Ver más →</a>
       </div>
       <div class="flex gap-6 overflow-x-auto pb-4 scroll-smooth snap-x">
-        <div class="min-w-[250px] bg-white rounded-lg shadow p-4 snap-start" *ngFor="let e of products">
-          <img [src]="e.img" class="rounded mb-3" [alt]="e.img">
-          <h6 class="font-bold mb-1">{{ e.name }}</h6>
+        <div class="min-w-[250px] bg-white rounded-lg shadow p-4 snap-start" *ngFor="let e of listaElectronica">
+          <img [src]="e.imageUrl" class="rounded mb-3 w-full h-48 object-cover" [alt]="e.imageUrl">
+          <h6 class="font-bold mb-1">{{ e.nombre }}</h6>
           <div class="flex items-center mb-2">
-            <span class="text-yellow-400">★★★★★</span>
-            <small class="ml-2 text-gray-500">{{ e.rating }} ({{ e.reviews }})</small>
+            <span *ngFor="let estrella of getEstrellas(e.valoracion)">
+              {{ estrella === 1 ? '★' : '☆' }}
+            </span>
           </div>
           <button class="w-full bg-blue-600 text-white py-2 rounded-full hover:bg-blue-700 transition">
             Ver detalles
@@ -152,11 +199,12 @@
         <a href="#" class="text-blue-600 font-semibold">Ver más →</a>
       </div>
       <div class="flex gap-6 overflow-x-auto pb-4 scroll-smooth snap-x">
-        <div class="min-w-[250px] bg-white rounded-lg shadow p-4 snap-start" *ngFor="let m of products">
-          <img [src]="m.img" class="rounded mb-3" [alt]="m.img">
-          <h6 class="font-bold mb-1">{{ m.name }}</h6>
-          <small class="text-gray-500">{{ m.rating }}</small>
-          <div>⭐ {{ m.rating }}</div>
+        <div class="min-w-[250px] bg-white rounded-lg shadow p-4 snap-start" *ngFor="let m of listaModa">
+          <img [src]="m.imageUrl" class="rounded mb-3 w-full h-48 object-cover" [alt]="m.imageUrl">
+          <h6 class="font-bold mb-1">{{ m.nombre }}</h6>
+          <span *ngFor="let estrella of getEstrellas(m.valoracion)">
+            {{ estrella === 1 ? '★' : '☆' }}
+          </span>
           <button class="w-full bg-blue-600 text-white py-2 mt-2 rounded-full hover:bg-blue-700 transition">
             Ver detalles
           </button>
@@ -170,7 +218,8 @@
     <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
       <div>
         <h5 class="font-bold mb-3">Sobre nosotros</h5>
-        <p class="text-sm">Reviewmeter es tu plataforma de confianza para descubrir opiniones auténticas sobre productos.
+        <p class="text-sm">Reviewmeter es tu plataforma de confianza para descubrir opiniones auténticas sobre
+          productos.
           Ayudamos a millones de usuarios a tomar mejores decisiones de compra.</p>
       </div>
       <div>
@@ -188,7 +237,8 @@
         <ul class="space-y-1 text-sm">
           <li><a href="#" class="hover:text-gray-300">Centro de ayuda</a></li>
           <li><a href="#" class="hover:text-gray-300">Soporte técnico</a></li>
-          <li><a href="#" class="hover:text-gray-300"><i class="bi bi-envelope me-2"></i> contacto@reviewhub.com</a></li>
+          <li><a href="#" class="hover:text-gray-300"><i class="bi bi-envelope me-2"></i> contacto@reviewhub.com</a>
+          </li>
           <li><a href="#" class="hover:text-gray-300">Para empresas</a></li>
           <li><a href="#" class="hover:text-gray-300">Trabaja con nosotros</a></li>
         </ul>

@@ -16,6 +16,8 @@ public class Categoria {
 
     private String nombre;
     private String descripcion;
+    private String imageUrl;
+    
 	public Long getIdCategoria() {
 		return idCategoria;
 	}
@@ -33,6 +35,12 @@ public class Categoria {
 	}
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
+	}
+	public String getImageUrl() {
+		return imageUrl;
+	}
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
 	}
 	
 }
