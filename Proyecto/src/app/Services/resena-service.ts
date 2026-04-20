@@ -22,19 +22,25 @@ export class ResenaService {
     return this.http.get<Resena>(`${this.baseUrl}/${id}`);
   }
 
-  // POST: Crear reseña (Tu backend devuelve el objeto guardado)
+  // POST: Crear reseña con token JWT
   crearResena(resena: Resena): Observable<Resena> {
-    return this.http.post<Resena>(this.baseUrl, resena);
+    const token = localStorage.getItem('token');
+    const headers = { Authorization: `Bearer ${token}` };
+    return this.http.post<Resena>(this.baseUrl, resena, { headers });
   }
 
-  // PUT: Actualizar reseña
+  // PUT: Actualizar reseña con token JWT
   actualizarResena(id: number, resena: Resena): Observable<Resena> {
-    return this.http.put<Resena>(`${this.baseUrl}/${id}`, resena);
+    const token = localStorage.getItem('token');
+    const headers = { Authorization: `Bearer ${token}` };
+    return this.http.put<Resena>(`${this.baseUrl}/${id}`, resena, { headers });
   }
 
-  // DELETE: Borrar reseña (Devuelve un String)
+  // DELETE: Borrar reseña con token JWT
   borrarResena(id: number): Observable<string> {
-    return this.http.delete(`${this.baseUrl}/${id}`, { responseType: 'text' });
+    const token = localStorage.getItem('token');
+    const headers = { Authorization: `Bearer ${token}` };
+    return this.http.delete(`${this.baseUrl}/${id}`, { headers, responseType: 'text' });
   }
 
   // --- MÉTODOS DE FILTRADO Y ORDENACIÓN ---
@@ -62,9 +68,21 @@ export class ResenaService {
     return this.http.get<Resena[]>(`${this.baseUrl}/orden-asc`);
   }
 
-  // GET: Obtener solo las reseñas de un producto específico
-getResenasPorProducto(idProducto: number): Observable<Resena[]> {
-  return this.http.get<Resena[]>(`${this.baseUrl}/producto/${idProducto}`);
-}
+  // GET: Obtener solo las reseñas de un producto específico con filtros opcionales
+  getResenasPorProducto(idProducto: number, orden?: string, minPuntuacion?: number): Observable<any[]> {
+    let params: any = {};
+    if (orden) params.orden = orden;
+    if (minPuntuacion && minPuntuacion > 0) params.minPuntuacion = minPuntuacion.toString();
+    
+    return this.http.get<any[]>(`${this.baseUrl}/producto/${idProducto}`, { params });
+  }
+
+  // GET: Mis reseñas (requiere token)
+  getMisResenas(): Observable<any[]> {
+    const token = localStorage.getItem('token');
+    return this.http.get<any[]>(`${this.baseUrl}/mis-resenas`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+  }
 
 }

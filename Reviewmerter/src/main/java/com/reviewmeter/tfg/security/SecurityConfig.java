@@ -43,6 +43,8 @@ public class SecurityConfig {
                     // Categorias, Productos y Reseñas (Lectura pública)
                     .requestMatchers(HttpMethod.GET, "/api/categorias/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
+                    // mis-resenas requiere auth — debe ir ANTES de la regla pública de GET
+                    .requestMatchers(HttpMethod.GET, "/api/resenas/mis-resenas").authenticated()
                     .requestMatchers(HttpMethod.GET, "/api/resenas/**").permitAll()
                     
                     // Admin
@@ -50,6 +52,10 @@ public class SecurityConfig {
                     
                     // Usuario logueado
                     .requestMatchers("/usuario/me").hasAnyRole("USER", "ADMIN")
+                    .requestMatchers(HttpMethod.PATCH, "/usuario/me").hasAnyRole("USER", "ADMIN")
+                    
+                    // Favoritos (requieren auth, el controller extrae el usuario del token)
+                    .requestMatchers("/api/favoritos/**").authenticated()
                     
                     // El resto de peticiones (POST, PUT, DELETE) requieren auth
                     .anyRequest().authenticated()

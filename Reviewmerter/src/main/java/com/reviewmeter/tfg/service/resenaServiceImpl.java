@@ -81,4 +81,24 @@ public class resenaServiceImpl implements resenaService {
 	    return resenaRepository.findByProducto_IdProducto(idProducto);
 	}
 
+	@Override
+	public List<Resena> getResenasPorProductoOrdenDesc(Long idProducto) {
+	    return resenaRepository.findByProducto_IdProductoOrderByPuntuacionDesc(idProducto);
+	}
+
+	@Override
+	public List<Resena> getResenasPorProductoOrdenAsc(Long idProducto) {
+	    return resenaRepository.findByProducto_IdProductoOrderByPuntuacionAsc(idProducto);
+	}
+
+	@Override
+	public List<Resena> getResenasPorProductoYPuntuacion(Long idProducto, int min) {
+	    return resenaRepository.findByProducto_IdProductoAndPuntuacionGreaterThanEqual(idProducto, min);
+	}
+
+	@Override
+	public List<Resena> getResenasPorUsuario(Long idUsuario) {
+	    return resenaRepository.findByUsuario_IdUsuario(idUsuario);
+	}
+
 }

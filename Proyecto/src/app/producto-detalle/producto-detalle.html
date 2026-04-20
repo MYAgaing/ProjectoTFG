@@ -62,11 +62,17 @@
           </div>
 
           <div class="flex flex-wrap gap-4">
-            <button class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition">
-              Escribir Reseña
+            <button (click)="abrirModalResena()"
+              class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition flex items-center gap-2">
+              <i class="bi bi-pencil-square"></i> Escribir Reseña
             </button>
-            <button class="bg-white border border-gray-200 text-gray-700 px-8 py-3 rounded-xl font-bold hover:bg-gray-50 transition">
-              Añadir a favoritos
+            <button (click)="toggleFavorito()" [disabled]="cargandoFavorito"
+              class="border px-8 py-3 rounded-xl font-bold transition flex items-center gap-2"
+              [class]="esFavorito
+                ? 'bg-red-50 border-red-300 text-red-500 hover:bg-red-100'
+                : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'">
+              <i [class]="esFavorito ? 'bi bi-heart-fill' : 'bi bi-heart'"></i>
+              {{ esFavorito ? 'En favoritos' : 'Añadir a favoritos' }}
             </button>
           </div>
         </div>
@@ -74,18 +80,32 @@
     </div>
 
     <div class="mt-12">
-      <div class="flex items-center justify-between mb-8">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <h2 class="text-2xl font-bold text-gray-900">Opiniones de la comunidad</h2>
-        <div class="flex gap-2">
-            <select class="border-gray-200 rounded-lg text-sm focus:ring-blue-500">
-                <option>Más recientes</option>
-                <option>Mejor puntuadas</option>
-            </select>
+        <div class="flex flex-wrap gap-3">
+          <!-- Filtro por puntuación -->
+          <select [(ngModel)]="filtroPuntuacion" (change)="aplicarFiltros()"
+            class="border border-gray-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+            <option [value]="0">Todas las puntuaciones</option>
+            <option [value]="5">5 estrellas</option>
+            <option [value]="4">4+ estrellas</option>
+            <option [value]="3">3+ estrellas</option>
+            <option [value]="2">2+ estrellas</option>
+            <option [value]="1">1+ estrellas</option>
+          </select>
+          
+          <!-- Filtro por orden -->
+          <select [(ngModel)]="filtroOrden" (change)="aplicarFiltros()"
+            class="border border-gray-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+            <option value="">Más recientes</option>
+            <option value="desc">Mejor puntuadas</option>
+            <option value="asc">Peor puntuadas</option>
+          </select>
         </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div *ngFor="let resena of listaResenas" class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+        <div *ngFor="let resena of listaResenasFiltradas" class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
           <div class="flex justify-between items-start mb-4">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
@@ -116,9 +136,66 @@
         </div>
       </div>
 
-      <div *ngIf="listaResenas?.length === 0" class="text-center py-20 bg-white rounded-2xl border-2 border-dashed border-gray-100">
-        <p class="text-gray-400">Este producto aún no tiene reseñas. ¡Sé el primero!</p>
+      <div *ngIf="listaResenasFiltradas?.length === 0" class="text-center py-20 bg-white rounded-2xl border-2 border-dashed border-gray-100">
+        <p class="text-gray-400">{{ filtroPuntuacion > 0 || filtroOrden ? 'No hay reseñas que coincidan con los filtros seleccionados.' : 'Este producto aún no tiene reseñas. ¡Sé el primero!' }}</p>
       </div>
     </div>
   </main>
+</div>
+
+<!-- Modal escribir reseña -->
+<div *ngIf="mostrarModalResena"
+     class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+     (click)="cerrarModalResena()">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-8 relative"
+       (click)="$event.stopPropagation()">
+
+    <button (click)="cerrarModalResena()"
+      class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+
+    <h2 class="text-2xl font-extrabold text-gray-900 mb-1">Escribir reseña</h2>
+    <p class="text-gray-500 text-sm mb-6">{{ product.nombre }}</p>
+
+    <!-- Estrellas -->
+    <div class="mb-5">
+      <label class="block text-sm font-semibold text-gray-700 mb-2">Puntuación</label>
+      <div class="flex gap-1">
+        <span *ngFor="let n of [1,2,3,4,5]"
+              (click)="setPuntuacion(n)"
+              (mouseenter)="estrellaHover = n"
+              (mouseleave)="estrellaHover = 0"
+              class="text-3xl cursor-pointer transition-colors"
+              [class]="(estrellaHover || nuevaResena.puntuacion) >= n ? 'text-yellow-400' : 'text-gray-300'">★</span>
+      </div>
+    </div>
+
+    <!-- Título -->
+    <div class="mb-4">
+      <label class="block text-sm font-semibold text-gray-700 mb-1">Título</label>
+      <input type="text" [(ngModel)]="nuevaResena.titulo" name="titulo"
+        placeholder="Resume tu experiencia..."
+        class="w-full border border-gray-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+    </div>
+
+    <!-- Comentario -->
+    <div class="mb-6">
+      <label class="block text-sm font-semibold text-gray-700 mb-1">Comentario</label>
+      <textarea [(ngModel)]="nuevaResena.comentario" name="comentario" rows="4"
+        placeholder="Cuéntanos más sobre el producto..."
+        class="w-full border border-gray-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none"></textarea>
+    </div>
+
+    <p *ngIf="mensajeResena" class="text-red-500 text-sm mb-4">{{ mensajeResena }}</p>
+
+    <div class="flex gap-3">
+      <button (click)="cerrarModalResena()"
+        class="flex-1 border border-gray-200 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-50 transition">
+        Cancelar
+      </button>
+      <button (click)="enviarResena()" [disabled]="enviandoResena"
+        class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition disabled:opacity-50">
+        {{ enviandoResena ? 'Enviando...' : 'Publicar reseña' }}
+      </button>
+    </div>
+  </div>
 </div>

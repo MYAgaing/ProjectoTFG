@@ -19,4 +19,12 @@ public interface resenaRepository extends JpaRepository<Resena, Long>{
     
     List<Resena> findByProducto_IdProducto(Long idProducto);
 
+    List<Resena> findByUsuario_IdUsuario(Long idUsuario);
+
+    List<Resena> findByProducto_IdProductoOrderByPuntuacionDesc(Long idProducto);
+
+    List<Resena> findByProducto_IdProductoOrderByPuntuacionAsc(Long idProducto);
+
+    List<Resena> findByProducto_IdProductoAndPuntuacionGreaterThanEqual(Long idProducto, int min);
+
 }

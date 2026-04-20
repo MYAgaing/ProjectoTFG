@@ -100,7 +100,7 @@
     <div class="container mx-auto px-4">
       <div class="flex justify-between items-center mb-6">
         <h3 class="text-2xl font-bold">Tecnología</h3>
-        <a href="#" class="text-blue-600 font-semibold">Ver más →</a>
+        <a [routerLink]="['/categoria', 1, 'Tecnología']" class="text-blue-600 font-semibold hover:underline cursor-pointer">Ver más →</a>
       </div>
       <div class="flex gap-6 overflow-x-auto pb-4 scroll-smooth snap-x">
         <div class="min-w-[250px] bg-white rounded-lg shadow p-4 snap-start" *ngFor="let t of listaTecnologia">
@@ -126,7 +126,7 @@
     <div class="container mx-auto px-4">
       <div class="flex justify-between items-center mb-6">
         <h3 class="text-2xl font-bold">Juegos</h3>
-        <a href="#" class="text-blue-600 font-semibold">Ver más →</a>
+        <a [routerLink]="['/categoria', 2, 'Juegos']" class="text-blue-600 font-semibold hover:underline cursor-pointer">Ver más →</a>
       </div>
       <div class="flex gap-6 overflow-x-auto pb-4 scroll-smooth snap-x">
         <div class="min-w-[250px] bg-white rounded-lg shadow p-4 snap-start" *ngFor="let j of listaJuegos">
@@ -149,7 +149,7 @@
     <div class="container mx-auto px-4">
       <div class="flex justify-between items-center mb-6">
         <h3 class="text-2xl font-bold">Libros</h3>
-        <a href="#" class="text-blue-600 font-semibold">Ver más →</a>
+        <a [routerLink]="['/categoria', 3, 'Libros']" class="text-blue-600 font-semibold hover:underline cursor-pointer">Ver más →</a>
       </div>
       <div class="flex gap-6 overflow-x-auto pb-4 scroll-smooth snap-x">
         <div class="min-w-[250px] bg-white rounded-lg shadow p-4 snap-start" *ngFor="let l of listaLibros">
@@ -172,7 +172,7 @@
     <div class="container mx-auto px-4">
       <div class="flex justify-between items-center mb-6">
         <h3 class="text-2xl font-bold">Electrónica</h3>
-        <a href="#" class="text-blue-600 font-semibold">Ver más →</a>
+        <a [routerLink]="['/categoria', 4, 'Electrónica']" class="text-blue-600 font-semibold hover:underline cursor-pointer">Ver más →</a>
       </div>
       <div class="flex gap-6 overflow-x-auto pb-4 scroll-smooth snap-x">
         <div class="min-w-[250px] bg-white rounded-lg shadow p-4 snap-start" *ngFor="let e of listaElectronica">
@@ -196,7 +196,7 @@
     <div class="container mx-auto px-4">
       <div class="flex justify-between items-center mb-6">
         <h3 class="text-2xl font-bold">Moda</h3>
-        <a href="#" class="text-blue-600 font-semibold">Ver más →</a>
+        <a [routerLink]="['/categoria', 5, 'Moda']" class="text-blue-600 font-semibold hover:underline cursor-pointer">Ver más →</a>
       </div>
       <div class="flex gap-6 overflow-x-auto pb-4 scroll-smooth snap-x">
         <div class="min-w-[250px] bg-white rounded-lg shadow p-4 snap-start" *ngFor="let m of listaModa">

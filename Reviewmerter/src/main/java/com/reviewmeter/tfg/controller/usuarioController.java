@@ -1,6 +1,7 @@
 package com.reviewmeter.tfg.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,7 @@ import com.reviewmeter.tfg.security.JwtService;
 
 @RestController
 @RequestMapping("/usuario")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.PATCH, RequestMethod.OPTIONS})
 public class usuarioController {
 	
 	@Autowired
@@ -36,6 +37,27 @@ public class usuarioController {
         String email = jwtService.extractEmail(token);
         return usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    }
+
+    @PatchMapping("/me")
+    public ResponseEntity<String> actualizarMiPerfil(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody Map<String, String> datos) {
+        String token = authHeader.substring(7);
+        String email = jwtService.extractEmail(token);
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        if (datos.containsKey("nombre") && !datos.get("nombre").isBlank()) {
+            usuario.setNombre(datos.get("nombre"));
+        }
+        if (datos.containsKey("password") && !datos.get("password").isBlank()) {
+            org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder encoder =
+                new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
+            usuario.setPassword(encoder.encode(datos.get("password")));
+        }
+        usuarioRepository.save(usuario);
+        return ResponseEntity.ok("Perfil actualizado correctamente");
     }
 
 

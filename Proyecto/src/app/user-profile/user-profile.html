@@ -1,146 +1,293 @@
-<!DOCTYPE html>
-<html lang="es">
+<div class="min-h-screen bg-gray-50">
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mi Espacio | Reviewmeter</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-
-<body class="bg-gradient-to-b from-blue-900 to-blue-600 text-gray-100">
-
-  <!-- NAVBAR -->
-  <nav class="bg-blue-950/80 backdrop-blur-lg shadow sticky top-0 z-50">
-    <div class="container mx-auto flex items-center justify-between p-4">
-      <a href="#" class="flex items-center text-white font-bold text-xl">
-        <span class="bg-blue-500 text-white rounded-full px-3 py-1 mr-3 text-2xl">R</span>
-        Reviewmeter
+  <!-- Navbar -->
+  <nav class="sticky top-0 bg-white shadow py-3 z-50">
+    <div class="container mx-auto px-4 flex items-center justify-between">
+      <a routerLink="/" class="flex items-center space-x-3 hover:opacity-90 transition">
+        <span class="bg-blue-600 text-white text-2xl font-bold px-3 py-2 rounded">R</span>
+        <span class="font-bold text-lg text-black">Reviewmeter</span>
       </a>
       <div class="flex items-center gap-3">
-        <a href="#" class="text-white hover:text-blue-200 transition">Inicio</a>
-        <button routerLink="/" class="px-4 py-2 border border-white text-white rounded-full hover:bg-white hover:text-blue-950 transition">
+        <a routerLink="/" class="text-gray-600 hover:text-blue-600 transition text-sm font-medium">Inicio</a>
+        <button (click)="logout()"
+          class="bg-red-500 text-white px-4 py-2 rounded-full flex items-center gap-2 hover:bg-red-600 transition text-sm font-medium">
           <i class="bi bi-box-arrow-right"></i> Cerrar sesión
         </button>
       </div>
     </div>
   </nav>
 
-  <!-- PERFIL -->
-  <section class="py-10">
-    <div class="container mx-auto">
-      <div class="bg-blue-800/80 backdrop-blur-md rounded-xl shadow-lg p-8 flex flex-col md:flex-row items-center gap-6">
-        <div class="text-center md:text-left">
-          <img src="https://via.placeholder.com/150" class="rounded-full mx-auto md:mx-0 mb-4 w-36 h-36 object-cover border-4 border-blue-500">
-          <button class="px-4 py-1 border border-blue-300 text-blue-300 rounded-full hover:bg-blue-300 hover:text-blue-950 transition">
-            Cambiar foto
-          </button>
-        </div>
-        <div class="flex-1">
-          <h3 class="text-2xl font-bold mb-2">Juan Pérez</h3>
-          <p class="text-blue-200 mb-4">Miembro desde Enero 2024</p>
-          <p class="mb-4">Apasionado por la tecnología, videojuegos y lectura. Me encanta compartir opiniones honestas para ayudar a otros usuarios.</p>
-          <button class="px-6 py-2 bg-blue-500 text-white rounded-full font-semibold hover:bg-blue-400 transition">
-            Editar perfil
-          </button>
-        </div>
+  <!-- Header perfil -->
+  <div class="bg-blue-600 text-white py-10">
+    <div class="container mx-auto px-4 flex items-center gap-6">
+      <div class="w-20 h-20 rounded-full bg-white text-blue-600 flex items-center justify-center text-4xl font-extrabold shadow-lg select-none">
+        {{ user?.nombre?.charAt(0)?.toUpperCase() || '?' }}
+      </div>
+      <div>
+        <h1 class="text-3xl font-extrabold">{{ user?.nombre }}</h1>
+        <p class="text-blue-200 text-sm mt-1">{{ user?.email }}</p>
+        <p class="text-blue-200 text-sm">Miembro desde {{ user?.fechaRegistro | date:'MMMM yyyy' }}</p>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- ESTADÍSTICAS -->
-  <section class="py-10">
-    <div class="container mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-      <div class="bg-blue-700/80 backdrop-blur-md shadow rounded-xl p-6 text-center">
-        <h4 class="text-2xl font-bold">25</h4>
-        <p class="text-blue-200">Reseñas publicadas</p>
+  <!-- Stats -->
+  <div class="bg-white border-b">
+    <div class="container mx-auto px-4 py-6 grid grid-cols-3 gap-4 text-center">
+      <div>
+        <p class="text-3xl font-extrabold text-blue-600">{{ misResenas.length }}</p>
+        <p class="text-gray-500 text-sm">Reseñas publicadas</p>
       </div>
-      <div class="bg-blue-700/80 backdrop-blur-md shadow rounded-xl p-6 text-center">
-        <h4 class="text-2xl font-bold">120</h4>
-        <p class="text-blue-200">Me gusta recibidos</p>
+      <div>
+        <p class="text-3xl font-extrabold text-blue-600">{{ misFavoritos.length }}</p>
+        <p class="text-gray-500 text-sm">Favoritos</p>
       </div>
-      <div class="bg-blue-700/80 backdrop-blur-md shadow rounded-xl p-6 text-center">
-        <h4 class="text-2xl font-bold">4.8 ⭐</h4>
-        <p class="text-blue-200">Valoración promedio</p>
-      </div>
-      <div class="bg-blue-700/80 backdrop-blur-md shadow rounded-xl p-6 text-center">
-        <h4 class="text-2xl font-bold">Nivel 3</h4>
-        <p class="text-blue-200">Usuario Experto</p>
+      <div>
+        <p class="text-3xl font-extrabold text-blue-600">{{ promedioValoracion() }}</p>
+        <p class="text-gray-500 text-sm">Valoración media</p>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- MIS RESEÑAS -->
-  <section class="py-10">
-    <div class="container mx-auto">
-      <div class="flex justify-between items-center mb-6">
-        <h3 class="text-2xl font-bold">Mis Reseñas</h3>
-        <button class="px-4 py-2 bg-blue-500 text-white rounded-full font-semibold hover:bg-blue-400 transition">
-          <i class="bi bi-plus-lg"></i> Nueva reseña
-        </button>
+  <!-- Tabs -->
+  <div class="container mx-auto px-4 mt-8">
+    <div class="flex gap-1 bg-gray-100 rounded-xl p-1 w-fit mb-8">
+      <button (click)="tabActivo = 'resenas'"
+        class="px-6 py-2 rounded-lg text-sm font-semibold transition"
+        [class]="tabActivo === 'resenas' ? 'bg-white text-blue-600 shadow' : 'text-gray-500 hover:text-gray-700'">
+        Mis reseñas
+      </button>
+      <button (click)="tabActivo = 'favoritos'"
+        class="px-6 py-2 rounded-lg text-sm font-semibold transition"
+        [class]="tabActivo === 'favoritos' ? 'bg-white text-blue-600 shadow' : 'text-gray-500 hover:text-gray-700'">
+        Favoritos
+      </button>
+      <button (click)="tabActivo = 'ajustes'"
+        class="px-6 py-2 rounded-lg text-sm font-semibold transition"
+        [class]="tabActivo === 'ajustes' ? 'bg-white text-blue-600 shadow' : 'text-gray-500 hover:text-gray-700'">
+        Ajustes de cuenta
+      </button>
+    </div>
+
+    <!-- Tab: Mis reseñas -->
+    <div *ngIf="tabActivo === 'resenas'">
+
+      <div *ngIf="misResenas.length === 0"
+           class="text-center py-20 bg-white rounded-2xl border-2 border-dashed border-gray-200">
+        <i class="bi bi-chat-square-text text-4xl text-gray-300"></i>
+        <p class="text-gray-400 mt-3">Todavía no has escrito ninguna reseña.</p>
+        <a routerLink="/" class="mt-4 inline-block bg-blue-600 text-white px-6 py-2 rounded-full text-sm font-semibold hover:bg-blue-700 transition">
+          Explorar productos
+        </a>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-blue-800/70 backdrop-blur-md shadow rounded-xl p-6 flex flex-col justify-between hover:scale-105 transition-transform">
-          <div>
-            <h6 class="font-bold">iPhone 15 Pro</h6>
-            <small class="text-blue-200">Publicado el 10 Feb 2026</small>
-            <p class="mt-2">Excelente rendimiento y cámara impresionante. La batería podría durar un poco más.</p>
-          </div>
-          <div class="flex justify-between items-center mt-4">
-            <span>⭐⭐⭐⭐⭐</span>
-            <div class="flex gap-2">
-              <button class="px-2 py-1 border border-blue-300 rounded hover:bg-blue-300 hover:text-blue-950 transition"><i class="bi bi-pencil"></i></button>
-              <button class="px-2 py-1 border border-red-500 text-red-500 rounded hover:bg-red-100 transition"><i class="bi bi-trash"></i></button>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-12">
+        <div *ngFor="let r of misResenas"
+             class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition">
+
+          <!-- Producto -->
+          <div class="flex items-center gap-3 mb-4">
+            <img [src]="r.producto?.imageUrl" [alt]="r.producto?.nombre"
+                 class="w-12 h-12 object-contain rounded-lg bg-gray-50 border border-gray-100 p-1">
+            <div>
+              <a [routerLink]="['/producto', r.producto?.idProducto]"
+                 class="font-bold text-gray-900 hover:text-blue-600 transition text-sm">
+                {{ r.producto?.nombre }}
+              </a>
+              <p class="text-xs text-gray-400">{{ r.producto?.marca }}</p>
             </div>
           </div>
-        </div>
 
-        <div class="bg-blue-800/70 backdrop-blur-md shadow rounded-xl p-6 flex flex-col justify-between hover:scale-105 transition-transform">
-          <div>
-            <h6 class="font-bold">PlayStation 5</h6>
-            <small class="text-blue-200">Publicado el 22 Ene 2026</small>
-            <p class="mt-2">Gran experiencia gaming, tiempos de carga casi inexistentes.</p>
-          </div>
-          <div class="flex justify-between items-center mt-4">
-            <span>⭐⭐⭐⭐</span>
-            <div class="flex gap-2">
-              <button class="px-2 py-1 border border-blue-300 rounded hover:bg-blue-300 hover:text-blue-950 transition"><i class="bi bi-pencil"></i></button>
-              <button class="px-2 py-1 border border-red-500 text-red-500 rounded hover:bg-red-100 transition"><i class="bi bi-trash"></i></button>
+          <!-- Estrellas y fecha -->
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex text-yellow-400 text-lg">
+              <span *ngFor="let s of getStars(r.puntuacion)">{{ s }}</span>
             </div>
+            <span class="text-xs text-gray-400">{{ r.fecha }}</span>
+          </div>
+
+          <h4 class="font-bold text-gray-800 mb-1">{{ r.titulo }}</h4>
+          <p class="text-gray-500 text-sm leading-relaxed line-clamp-3">{{ r.comentario }}</p>
+
+          <!-- Acciones -->
+          <div class="flex gap-2 mt-4 pt-4 border-t border-gray-100">
+            <button (click)="abrirEditar(r)"
+              class="flex-1 flex items-center justify-center gap-1 border border-blue-200 text-blue-600 py-2 rounded-xl text-sm font-semibold hover:bg-blue-50 transition">
+              <i class="bi bi-pencil"></i> Editar
+            </button>
+            <button (click)="confirmarBorrar(r)"
+              class="flex-1 flex items-center justify-center gap-1 border border-red-200 text-red-500 py-2 rounded-xl text-sm font-semibold hover:bg-red-50 transition">
+              <i class="bi bi-trash"></i> Eliminar
+            </button>
           </div>
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- CONFIGURACIÓN -->
-  <section class="py-10">
-    <div class="container mx-auto">
-      <h3 class="text-2xl font-bold mb-6">Configuración</h3>
-      <div class="bg-blue-800/70 backdrop-blur-md shadow rounded-xl p-6 space-y-4">
-        <div>
-          <label class="block text-blue-200 mb-1 font-medium">Nombre</label>
-          <input type="text" class="w-full border border-blue-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-400 text-blue-900" value="Juan Pérez">
+    <!-- Tab: Favoritos -->
+    <div *ngIf="tabActivo === 'favoritos'">
+
+      <div *ngIf="misFavoritos.length === 0"
+           class="text-center py-20 bg-white rounded-2xl border-2 border-dashed border-gray-200">
+        <i class="bi bi-heart text-4xl text-gray-300"></i>
+        <p class="text-gray-400 mt-3">Todavía no tienes productos favoritos.</p>
+        <a routerLink="/" class="mt-4 inline-block bg-blue-600 text-white px-6 py-2 rounded-full text-sm font-semibold hover:bg-blue-700 transition">
+          Explorar productos
+        </a>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-12">
+        <div *ngFor="let f of misFavoritos"
+             class="group bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+
+          <div class="relative h-44 bg-gray-50 flex items-center justify-center overflow-hidden">
+            <img [src]="f.producto?.imageUrl" [alt]="f.producto?.nombre"
+                 class="h-full w-full object-contain p-4 transition-transform duration-300 group-hover:scale-105">
+            <span class="absolute top-3 left-3 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full uppercase">
+              {{ f.producto?.marca }}
+            </span>
+            <button (click)="quitarFavorito(f.producto?.idProducto)"
+              class="absolute top-3 right-3 bg-white text-red-500 rounded-full w-8 h-8 flex items-center justify-center shadow hover:bg-red-50 transition"
+              title="Quitar de favoritos">
+              <i class="bi bi-heart-fill text-sm"></i>
+            </button>
+          </div>
+
+          <div class="p-4">
+            <h3 class="font-bold text-gray-900 text-sm leading-snug mb-1 line-clamp-2">{{ f.producto?.nombre }}</h3>
+            <p class="text-gray-400 text-xs mb-3">{{ f.producto?.categoria?.nombre }}</p>
+            <a [routerLink]="['/producto', f.producto?.idProducto]"
+               class="block w-full text-center bg-blue-600 text-white py-2 rounded-xl text-sm font-semibold hover:bg-blue-700 transition">
+              Ver producto
+            </a>
+          </div>
         </div>
-        <div>
-          <label class="block text-blue-200 mb-1 font-medium">Correo electrónico</label>
-          <input type="email" class="w-full border border-blue-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-400 text-blue-900" value="juan@email.com">
+      </div>
+    </div>
+
+    <!-- Tab: Ajustes -->
+    <div *ngIf="tabActivo === 'ajustes'" class="max-w-lg pb-12">
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+        <h2 class="text-xl font-extrabold text-gray-900 mb-6">Ajustes de cuenta</h2>
+
+        <!-- Nombre -->
+        <div class="mb-5">
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Nombre de usuario</label>
+          <input type="text" [(ngModel)]="nuevoNombre" name="nombre"
+            class="w-full border border-gray-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
         </div>
-        <div>
-          <label class="block text-blue-200 mb-1 font-medium">Nueva contraseña</label>
-          <input type="password" class="w-full border border-blue-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-400">
+
+        <hr class="my-6 border-gray-100">
+        <p class="text-sm font-semibold text-gray-700 mb-4">Cambiar contraseña <span class="text-gray-400 font-normal">(deja en blanco para no cambiarla)</span></p>
+
+        <!-- Nueva contraseña -->
+        <div class="mb-4">
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Nueva contraseña</label>
+          <input type="password" [(ngModel)]="nuevaPassword" name="password"
+            placeholder="Mínimo 6 caracteres"
+            class="w-full border border-gray-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
         </div>
-        <button class="px-6 py-2 bg-blue-500 text-white rounded-full font-semibold hover:bg-blue-400 transition">
-          Guardar cambios
+
+        <!-- Confirmar contraseña -->
+        <div class="mb-6">
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Confirmar contraseña</label>
+          <input type="password" [(ngModel)]="confirmarPassword" name="confirmar"
+            class="w-full border border-gray-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+        </div>
+
+        <!-- Mensajes -->
+        <p *ngIf="mensajeGuardado" class="text-green-600 text-sm mb-4 flex items-center gap-1">
+          <i class="bi bi-check-circle-fill"></i> {{ mensajeGuardado }}
+        </p>
+        <p *ngIf="errorGuardado" class="text-red-500 text-sm mb-4 flex items-center gap-1">
+          <i class="bi bi-exclamation-circle-fill"></i> {{ errorGuardado }}
+        </p>
+
+        <button (click)="guardarCambios()" [disabled]="guardando"
+          class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition disabled:opacity-50">
+          {{ guardando ? 'Guardando...' : 'Guardar cambios' }}
         </button>
       </div>
     </div>
-  </section>
 
-  <!-- FOOTER -->
-  <footer class="bg-blue-950 text-blue-200 py-6 mt-10 text-center">
-    © 2026 Reviewmeter - Espacio personal
-  </footer>
+  </div>
+</div>
 
-</body>
-</html>
+<!-- Modal editar reseña -->
+<div *ngIf="mostrarModalEditar"
+     class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+     (click)="cerrarEditar()">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-8 relative"
+       (click)="$event.stopPropagation()">
+
+    <button (click)="cerrarEditar()"
+      class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+
+    <h2 class="text-2xl font-extrabold text-gray-900 mb-1">Editar reseña</h2>
+    <p class="text-gray-500 text-sm mb-6">{{ resenaEditando?.producto?.nombre }}</p>
+
+    <!-- Estrellas -->
+    <div class="mb-5">
+      <label class="block text-sm font-semibold text-gray-700 mb-2">Puntuación</label>
+      <div class="flex gap-1">
+        <span *ngFor="let n of [1,2,3,4,5]"
+              (click)="editPuntuacion = n"
+              (mouseenter)="editEstrellaHover = n"
+              (mouseleave)="editEstrellaHover = 0"
+              class="text-3xl cursor-pointer transition-colors"
+              [class]="(editEstrellaHover || editPuntuacion) >= n ? 'text-yellow-400' : 'text-gray-300'">★</span>
+      </div>
+    </div>
+
+    <!-- Título -->
+    <div class="mb-4">
+      <label class="block text-sm font-semibold text-gray-700 mb-1">Título</label>
+      <input type="text" [(ngModel)]="editTitulo" name="editTitulo"
+        class="w-full border border-gray-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+    </div>
+
+    <!-- Comentario -->
+    <div class="mb-6">
+      <label class="block text-sm font-semibold text-gray-700 mb-1">Comentario</label>
+      <textarea [(ngModel)]="editComentario" name="editComentario" rows="4"
+        class="w-full border border-gray-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none"></textarea>
+    </div>
+
+    <div class="flex gap-3">
+      <button (click)="cerrarEditar()"
+        class="flex-1 border border-gray-200 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-50 transition">
+        Cancelar
+      </button>
+      <button (click)="guardarEdicion()" [disabled]="guardandoEdicion"
+        class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition disabled:opacity-50">
+        {{ guardandoEdicion ? 'Guardando...' : 'Guardar cambios' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal confirmar borrar -->
+<div *ngIf="mostrarConfirmBorrar"
+     class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+     (click)="cancelarBorrar()">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8 text-center relative"
+       (click)="$event.stopPropagation()">
+    <div class="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+      <i class="bi bi-trash text-red-500 text-2xl"></i>
+    </div>
+    <h3 class="text-xl font-extrabold text-gray-900 mb-2">¿Eliminar reseña?</h3>
+    <p class="text-gray-500 text-sm mb-6">
+      Se eliminará tu reseña de <span class="font-semibold text-gray-700">{{ resenaABorrar?.producto?.nombre }}</span>. Esta acción no se puede deshacer.
+    </p>
+    <div class="flex gap-3">
+      <button (click)="cancelarBorrar()"
+        class="flex-1 border border-gray-200 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-50 transition">
+        Cancelar
+      </button>
+      <button (click)="borrarResena()"
+        class="flex-1 bg-red-500 text-white py-3 rounded-xl font-bold hover:bg-red-600 transition">
+        Eliminar
+      </button>
+    </div>
+  </div>
+</div>

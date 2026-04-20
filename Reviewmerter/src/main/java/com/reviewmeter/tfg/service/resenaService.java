@@ -27,4 +27,12 @@ public interface resenaService {
 	List<Resena> ordenarPorPuntuacionAsc();
 
 	List<Resena> getResenasPorProducto(Long idProducto);
+
+	List<Resena> getResenasPorProductoOrdenDesc(Long idProducto);
+
+	List<Resena> getResenasPorProductoOrdenAsc(Long idProducto);
+
+	List<Resena> getResenasPorProductoYPuntuacion(Long idProducto, int min);
+
+	List<Resena> getResenasPorUsuario(Long idUsuario);
 }
