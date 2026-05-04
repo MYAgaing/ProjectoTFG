@@ -1,12 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from '../../../enviroments/enviroment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthServiceTs {
 
-  private api = 'http://localhost:8080/auth';
+  private api = `${environment.apiUrl}/auth`;
 
   constructor(private http: HttpClient) { }
 
@@ -34,14 +35,14 @@ export class AuthServiceTs {
   getUserProfile() {
     const token = this.getToken();
     if (!token) return null;
-    return this.http.get<any>('http://localhost:8080/usuario/me', {
+    return this.http.get<any>(`${environment.apiUrl}/usuario/me`, {
       headers: { Authorization: `Bearer ${token}` }
     });
   }
 
   actualizarPerfil(datos: { nombre?: string; password?: string }) {
     const token = this.getToken();
-    return this.http.patch('http://localhost:8080/usuario/me', datos, {
+    return this.http.patch(`${environment.apiUrl}/usuario/me`, datos, {
       headers: { Authorization: `Bearer ${token}` },
       responseType: 'text'
     });

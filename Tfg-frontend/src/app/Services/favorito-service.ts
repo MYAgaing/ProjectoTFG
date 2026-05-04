@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthServiceTs } from '../Auth/ServiceAuth/auth.service';
+import { environment } from '../../enviroments/enviroment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FavoritoService {
 
-  private baseUrl = 'http://localhost:8080/api/favoritos';
+  private baseUrl = `${environment.apiUrl}/api/favoritos`;
 
   constructor(private http: HttpClient, private auth: AuthServiceTs) {}
 

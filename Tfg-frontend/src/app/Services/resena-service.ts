@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { Resena } from '../Model/resenaModel.Model';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { environment } from '../../enviroments/enviroment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ResenaService {
 
-  private baseUrl = 'http://localhost:8080/api/resenas'; // Ajusta según tu controller
+  private baseUrl = `${environment.apiUrl}/api/resenas`;
 
   constructor(private http: HttpClient) { }
 
