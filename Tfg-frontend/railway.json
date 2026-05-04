@@ -3,6 +3,6 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "npx serve dist/proyecto/browser -l 0.0.0.0:$PORT"
+    "startCommand": "npx serve dist/proyecto/browser -p $PORT"
   }
 }
