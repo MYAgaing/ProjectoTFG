@@ -4,6 +4,6 @@
     "buildCommand": "npm run build"
   },
   "deploy": {
-    "startCommand": "ls dist/ && npx serve dist/proyecto/browser -p $PORT --single"
+    "startCommand": "ls dist/ && npx serve dist/Proyecto/browser -p $PORT --single"
   }
 }
