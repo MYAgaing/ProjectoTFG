@@ -1,8 +1,9 @@
 {
   "build": {
-    "builder": "NIXPACKS"
+    "builder": "NIXPACKS",
+    "buildCommand": "npm run build"
   },
   "deploy": {
-    "startCommand": "npx serve dist/proyecto/browser -p $PORT --single"
+    "startCommand": "ls dist/ && npx serve dist/proyecto/browser -p $PORT --single"
   }
 }
