@@ -126,20 +126,17 @@ public class resenasController {
 			@PathVariable Long id,
 			@RequestParam(required = false) String orden,
 			@RequestParam(required = false) Integer minPuntuacion) {
-		
-		// Si hay filtro de puntuación mínima
+
 		if (minPuntuacion != null && minPuntuacion > 0) {
 			return resenaService.getResenasPorProductoYPuntuacion(id, minPuntuacion);
 		}
-		
-		// Si hay orden especificado
+
 		if ("desc".equals(orden)) {
 			return resenaService.getResenasPorProductoOrdenDesc(id);
 		} else if ("asc".equals(orden)) {
 			return resenaService.getResenasPorProductoOrdenAsc(id);
 		}
-		
-		// Por defecto sin filtros
+
 		return resenaService.getResenasPorProducto(id);
 	}
 }

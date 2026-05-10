@@ -52,16 +52,13 @@ public class JwtFilter extends OncePerRequestFilter {
 	        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 	            UserDetails user = userDetailsService.loadUserByUsername(email);
 
-	            // Validar si el token es correcto (puedes añadir aquí jwtService.isTokenValid)
 	            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
 	                    user, null, user.getAuthorities());
 	            
 	            SecurityContextHolder.getContext().setAuthentication(auth);
 	        }
 	    } catch (Exception e) {
-	        // Si el token falla en una ruta PROTEGIDA, Spring dará 403.
-	        // Si falla en una ruta PÚBLICA, no pasa nada porque ya llamamos a doFilter arriba.
-	        System.out.println("Error procesando JWT: " + e.getMessage());
+	        // Token inválido — Spring denegará el acceso en rutas protegidas
 	    }
 
 	    // 3️⃣ Continuar con la cadena

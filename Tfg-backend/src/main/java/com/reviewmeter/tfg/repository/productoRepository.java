@@ -6,8 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.reviewmeter.tfg.model.Producto;
 
-public interface productoRepository extends JpaRepository<Producto, Long>{
+public interface productoRepository extends JpaRepository<Producto, Long> {
 
-	List<Producto> findByCategoria_IdCategoria(Long idCategoria);
-	
+    List<Producto> findByCategoria_IdCategoria(Long idCategoria);
+
+    List<Producto> findByNombreContainingIgnoreCase(String nombre);
 }

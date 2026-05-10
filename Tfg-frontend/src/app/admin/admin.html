@@ -1,0 +1,352 @@
+<div class="min-h-screen bg-gray-50">
+
+  <!-- Navbar -->
+  <nav class="sticky top-0 bg-white shadow py-3 z-50">
+    <div class="container mx-auto px-4 flex items-center justify-between">
+      <a routerLink="/" class="flex items-center space-x-3 hover:opacity-90 transition">
+        <span class="bg-blue-600 text-white text-2xl font-bold px-3 py-2 rounded">R</span>
+        <span class="font-bold text-lg text-black">Reviewmeter</span>
+        <span class="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-1 rounded-full">ADMIN</span>
+      </a>
+      <div class="flex items-center gap-3">
+        <a routerLink="/" class="text-gray-600 hover:text-blue-600 transition text-sm font-medium">Inicio</a>
+        <button (click)="logout()"
+          class="bg-red-500 text-white px-4 py-2 rounded-full flex items-center gap-2 hover:bg-red-600 transition text-sm font-medium">
+          <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mx-auto px-4 py-8">
+
+    <!-- Cabecera -->
+    <div class="mb-6">
+      <h1 class="text-3xl font-extrabold text-gray-900 flex items-center gap-3">
+        <i class="bi bi-shield-check text-purple-600"></i> Panel de administración
+      </h1>
+    </div>
+
+    <!-- Tabs principales -->
+    <div class="flex gap-1 bg-gray-100 rounded-xl p-1 w-fit mb-8">
+      <button (click)="tabActivo = 'reportes'"
+        class="px-6 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2"
+        [class]="tabActivo === 'reportes' ? 'bg-white text-purple-600 shadow' : 'text-gray-500 hover:text-gray-700'">
+        <i class="bi bi-slash-circle"></i> Reportes
+        <span *ngIf="tabActivo === 'reportes' && filtro === 'PENDIENTE' && reportes.length > 0"
+              class="bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+          {{ reportes.length }}
+        </span>
+      </button>
+      <button (click)="tabActivo = 'estadisticas'"
+        class="px-6 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2"
+        [class]="tabActivo === 'estadisticas' ? 'bg-white text-purple-600 shadow' : 'text-gray-500 hover:text-gray-700'">
+        <i class="bi bi-bar-chart-line"></i> Estadísticas
+      </button>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════════════ -->
+    <!-- TAB: REPORTES                                                             -->
+    <!-- ══════════════════════════════════════════════════════════════════════════ -->
+    <div *ngIf="tabActivo === 'reportes'">
+
+      <div class="flex gap-2 mb-6">
+        <button (click)="cambiarFiltro('PENDIENTE')"
+          class="px-5 py-2 rounded-xl text-sm font-semibold transition"
+          [class]="filtro === 'PENDIENTE' ? 'bg-yellow-500 text-white shadow' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'">
+          <i class="bi bi-clock-history mr-1"></i> Pendientes
+        </button>
+        <button (click)="cambiarFiltro('TODOS')"
+          class="px-5 py-2 rounded-xl text-sm font-semibold transition"
+          [class]="filtro === 'TODOS' ? 'bg-gray-800 text-white shadow' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'">
+          <i class="bi bi-list-ul mr-1"></i> Todos
+        </button>
+      </div>
+
+      <div *ngIf="cargandoReportes" class="text-center py-20">
+        <div class="inline-block w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+
+      <div *ngIf="!cargandoReportes && reportes.length === 0"
+           class="text-center py-20 bg-white rounded-2xl border-2 border-dashed border-gray-200">
+        <i class="bi bi-check-circle text-5xl text-green-300"></i>
+        <p class="text-gray-400 mt-3 font-semibold">
+          {{ filtro === 'PENDIENTE' ? '¡Todo limpio! No hay reportes pendientes.' : 'No hay reportes registrados.' }}
+        </p>
+      </div>
+
+      <div *ngIf="!cargandoReportes && reportes.length > 0" class="space-y-4">
+        <div *ngFor="let r of reportes" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition">
+          <div class="flex flex-col md:flex-row md:items-start gap-4">
+            <div class="flex-1 min-w-0">
+              <div class="flex flex-wrap items-center gap-2 mb-3">
+                <span class="text-xs font-bold px-2.5 py-1 rounded-full" [class]="estadoBadge(r.estado)">{{ r.estado }}</span>
+                <span class="bg-red-50 text-red-600 text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                  <i class="bi bi-slash-circle"></i> {{ motivoLabel(r.motivo) }}
+                </span>
+                <span class="text-gray-400 text-xs ml-auto">{{ r.fecha | date:'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+              <div class="bg-gray-50 rounded-xl p-4 mb-3">
+                <div class="flex items-center gap-2 mb-2">
+                  <div class="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                    {{ r.resena?.usuario?.nombre?.charAt(0) || 'U' }}
+                  </div>
+                  <span class="font-semibold text-gray-800 text-sm">{{ r.resena?.usuario?.nombre }}</span>
+                  <div class="flex text-yellow-400 text-xs ml-1">
+                    <span *ngFor="let s of [1,2,3,4,5]">{{ s <= r.resena?.puntuacion ? '★' : '☆' }}</span>
+                  </div>
+                  <a [routerLink]="['/producto', r.resena?.producto?.idProducto]"
+                     class="ml-auto text-xs text-blue-500 hover:underline truncate max-w-32">
+                    {{ r.resena?.producto?.nombre }}
+                  </a>
+                </div>
+                <p class="font-bold text-gray-800 text-sm mb-1">{{ r.resena?.titulo }}</p>
+                <p class="text-gray-600 text-sm line-clamp-3">{{ r.resena?.comentario }}</p>
+              </div>
+              <div *ngIf="r.descripcion" class="text-sm text-gray-500 italic mb-2">
+                <i class="bi bi-chat-left-quote mr-1"></i>"{{ r.descripcion }}"
+              </div>
+              <p class="text-xs text-gray-400">Reportado por <span class="font-semibold text-gray-600">{{ r.usuarioReporta?.nombre }}</span></p>
+            </div>
+            <div *ngIf="r.estado === 'PENDIENTE'" class="flex flex-row md:flex-col gap-2 shrink-0">
+              <button (click)="confirmarAccion(r, 'eliminar')"
+                class="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-red-600 transition">
+                <i class="bi bi-trash"></i> Eliminar reseña
+              </button>
+              <button (click)="confirmarAccion(r, 'descartar')"
+                class="flex items-center gap-2 border border-gray-200 text-gray-600 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-gray-50 transition">
+                <i class="bi bi-x-circle"></i> Descartar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════════════ -->
+    <!-- TAB: ESTADÍSTICAS                                                         -->
+    <!-- ══════════════════════════════════════════════════════════════════════════ -->
+    <div *ngIf="tabActivo === 'estadisticas'">
+
+      <!-- Buscador de producto -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
+        <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+          <i class="bi bi-search text-purple-600"></i> Buscar producto
+        </h2>
+        <div class="relative">
+          <input type="text" [(ngModel)]="busqueda" (input)="onBusqueda(busqueda)"
+            placeholder="Escribe el nombre del producto..."
+            class="w-full border border-gray-200 rounded-xl px-4 py-3 pr-10 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm">
+          <i class="bi bi-search absolute right-4 top-3.5 text-gray-400"></i>
+        </div>
+
+        <!-- Resultados de búsqueda -->
+        <div *ngIf="resultadosBusqueda.length > 0"
+             class="mt-2 border border-gray-100 rounded-xl shadow-lg overflow-hidden">
+          <button *ngFor="let p of resultadosBusqueda"
+            (click)="seleccionarProducto(p)"
+            class="w-full flex items-center gap-3 px-4 py-3 hover:bg-purple-50 transition text-left border-b border-gray-50 last:border-0">
+            <img [src]="p.imageUrl" [alt]="p.nombre" class="w-10 h-10 object-contain rounded-lg bg-gray-50 border border-gray-100 p-1 shrink-0">
+            <div>
+              <p class="font-semibold text-gray-800 text-sm">{{ p.nombre }}</p>
+              <p class="text-xs text-gray-400">{{ p.marca }} · {{ p.categoria?.nombre }}</p>
+            </div>
+          </button>
+        </div>
+
+        <div *ngIf="buscando" class="mt-3 text-center text-sm text-gray-400">
+          <div class="inline-block w-4 h-4 border-2 border-purple-400 border-t-transparent rounded-full animate-spin mr-2"></div>
+          Buscando...
+        </div>
+      </div>
+
+      <!-- Cargando stats -->
+      <div *ngIf="cargandoStats" class="text-center py-20">
+        <div class="inline-block w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+        <p class="text-gray-400 mt-3 text-sm">Cargando estadísticas...</p>
+      </div>
+
+      <!-- Error stats -->
+      <div *ngIf="errorStats" class="text-center py-12 bg-white rounded-2xl border-2 border-dashed border-red-100">
+        <i class="bi bi-exclamation-triangle text-4xl text-red-300"></i>
+        <p class="text-red-400 mt-3">No se pudieron cargar las estadísticas.</p>
+      </div>
+
+      <!-- Sin producto seleccionado -->
+      <div *ngIf="!stats && !cargandoStats && !errorStats"
+           class="text-center py-20 bg-white rounded-2xl border-2 border-dashed border-gray-200">
+        <i class="bi bi-bar-chart-line text-5xl text-gray-300"></i>
+        <p class="text-gray-400 mt-3">Busca un producto para ver sus estadísticas.</p>
+      </div>
+
+      <!-- Panel de estadísticas -->
+      <div *ngIf="stats && !cargandoStats">
+
+        <!-- Cabecera del producto -->
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6 flex items-center gap-4">
+          <img [src]="stats.imageUrl" [alt]="stats.nombreProducto"
+               class="w-16 h-16 object-contain rounded-xl bg-gray-50 border border-gray-100 p-2 shrink-0">
+          <div>
+            <h2 class="text-xl font-extrabold text-gray-900">{{ stats.nombreProducto }}</h2>
+            <p class="text-gray-400 text-sm">{{ stats.marca }} · {{ stats.categoria }}</p>
+          </div>
+        </div>
+
+        <!-- Tarjetas métricas principales -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 text-center">
+            <p class="text-3xl font-extrabold text-blue-600">{{ stats.totalResenas }}</p>
+            <p class="text-gray-500 text-xs mt-1">Total reseñas</p>
+          </div>
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 text-center">
+            <p class="text-3xl font-extrabold text-yellow-500">
+              {{ stats.puntuacionMedia > 0 ? stats.puntuacionMedia : '—' }}
+            </p>
+            <p class="text-gray-500 text-xs mt-1">Puntuación media</p>
+          </div>
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 text-center">
+            <div class="flex justify-center text-yellow-400 text-lg mb-1">
+              <span *ngFor="let s of estrellas(stats.puntuacionMedia)">{{ s }}</span>
+            </div>
+            <p class="text-gray-500 text-xs">Valoración visual</p>
+          </div>
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 text-center">
+            <p class="text-3xl font-extrabold text-green-600">
+              {{ stats.evolucionMensual?.[5]?.totalResenas ?? 0 }}
+            </p>
+            <p class="text-gray-500 text-xs mt-1">Reseñas este mes</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+
+          <!-- Distribución por estrellas -->
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <i class="bi bi-star-half text-yellow-500"></i> Distribución de puntuaciones
+            </h3>
+            <div class="space-y-3">
+              <div *ngFor="let item of distribucionArray()" class="flex items-center gap-3">
+                <span class="text-yellow-400 text-sm w-20 shrink-0">
+                  <span *ngFor="let s of [1,2,3,4,5]">{{ s <= item.estrellas ? '★' : '☆' }}</span>
+                </span>
+                <div class="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                  <div class="bg-yellow-400 h-3 rounded-full transition-all duration-700"
+                       [style.width.%]="item.pct"></div>
+                </div>
+                <span class="text-sm text-gray-500 w-16 text-right">{{ item.count }} ({{ item.pct }}%)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Evolución mensual — gráfico de barras simple -->
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <i class="bi bi-graph-up text-blue-500"></i> Evolución mensual (6 meses)
+            </h3>
+            <div class="flex items-end gap-2 h-32">
+              <div *ngFor="let mes of stats.evolucionMensual"
+                   class="flex-1 flex flex-col items-center gap-1">
+                <span class="text-xs text-gray-500 font-semibold">{{ mes.totalResenas }}</span>
+                <div class="w-full bg-blue-500 rounded-t-lg transition-all duration-700 min-h-1"
+                     [style.height.%]="alturaBarraEvolucion(mes.totalResenas)"
+                     [style.max-height.px]="96"
+                     [title]="mes.etiqueta + ': ' + mes.totalResenas + ' reseñas, media ' + mes.puntuacionMedia">
+                </div>
+                <span class="text-xs text-gray-400 text-center leading-tight">{{ mes.etiqueta }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Últimas reseñas -->
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <h3 class="font-bold text-gray-900 flex items-center gap-2">
+              <i class="bi bi-chat-square-text text-purple-500"></i> Reseñas del producto
+            </h3>
+            <!-- Filtro por estrellas -->
+            <div class="flex flex-wrap gap-1.5">
+              <button (click)="filtroEstrellas = 0"
+                class="px-3 py-1 rounded-lg text-xs font-semibold transition"
+                [class]="filtroEstrellas === 0
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'">
+                Todas
+              </button>
+              <button *ngFor="let n of [5,4,3,2,1]"
+                (click)="filtroEstrellas = n"
+                class="px-3 py-1 rounded-lg text-xs font-semibold transition flex items-center gap-1"
+                [class]="filtroEstrellas === n
+                  ? 'bg-yellow-400 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'">
+                {{ n }} <span class="text-yellow-500" [class.text-white]="filtroEstrellas === n">★</span>
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="resenasFiltradas().length === 0" class="text-center py-8 text-gray-400 text-sm">
+            {{ filtroEstrellas > 0 ? 'No hay reseñas de ' + filtroEstrellas + ' estrellas.' : 'Este producto aún no tiene reseñas.' }}
+          </div>
+          <div class="space-y-4">
+            <div *ngFor="let r of resenasFiltradas()"
+                 class="flex gap-4 p-4 bg-gray-50 rounded-xl">
+              <div class="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
+                {{ r.autor?.charAt(0) || 'U' }}
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="font-semibold text-gray-800 text-sm">{{ r.autor }}</span>
+                  <div class="flex text-yellow-400 text-xs">
+                    <span *ngFor="let s of [1,2,3,4,5]">{{ s <= r.puntuacion ? '★' : '☆' }}</span>
+                  </div>
+                  <span class="text-xs text-gray-400 ml-auto">{{ r.fecha }}</span>
+                </div>
+                <p class="font-semibold text-gray-700 text-sm">{{ r.titulo }}</p>
+                <p class="text-gray-500 text-sm line-clamp-2">{{ r.comentario }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal confirmación reportes -->
+<div *ngIf="mostrarConfirm"
+     class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+     (click)="cancelarAccion()">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8 text-center relative"
+       (click)="$event.stopPropagation()">
+    <div class="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4"
+         [class]="accionPendiente === 'eliminar' ? 'bg-red-100' : 'bg-gray-100'">
+      <i class="text-2xl" [class]="accionPendiente === 'eliminar' ? 'bi bi-trash text-red-500' : 'bi bi-x-circle text-gray-500'"></i>
+    </div>
+    <h3 class="text-xl font-extrabold text-gray-900 mb-2">
+      {{ accionPendiente === 'eliminar' ? '¿Eliminar la reseña?' : '¿Descartar el reporte?' }}
+    </h3>
+    <p class="text-gray-500 text-sm mb-6">
+      <ng-container *ngIf="accionPendiente === 'eliminar'">
+        La reseña de <span class="font-semibold text-gray-700">{{ reporteSeleccionado?.resena?.usuario?.nombre }}</span> será eliminada permanentemente.
+      </ng-container>
+      <ng-container *ngIf="accionPendiente === 'descartar'">
+        El reporte quedará descartado y la reseña seguirá visible.
+      </ng-container>
+    </p>
+    <p *ngIf="mensajeAccion" class="text-red-500 text-sm mb-4">{{ mensajeAccion }}</p>
+    <div class="flex gap-3">
+      <button (click)="cancelarAccion()" [disabled]="procesando"
+        class="flex-1 border border-gray-200 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-50 transition disabled:opacity-50">
+        Cancelar
+      </button>
+      <button (click)="ejecutarAccion()" [disabled]="procesando"
+        class="flex-1 py-3 rounded-xl font-bold transition disabled:opacity-50 text-white"
+        [class]="accionPendiente === 'eliminar' ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-700 hover:bg-gray-800'">
+        {{ procesando ? 'Procesando...' : (accionPendiente === 'eliminar' ? 'Eliminar' : 'Descartar') }}
+      </button>
+    </div>
+  </div>
+</div>

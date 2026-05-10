@@ -427,11 +427,31 @@ public class DataInitializer implements CommandLineRunner {
 			"Lo recomiendo a todo el mundo. Ya se lo he dicho a todos mis amigos y familia sin excepción."
 		};
 
-		for (int i = 0; i < 150; i++) {
+		// Pesos de puntuación: más reseñas de 4 y 5 estrellas para datos realistas
+		int[] puntuacionesPosibles = {1, 2, 3, 3, 4, 4, 4, 5, 5, 5};
+
+		// Los primeros 10 productos reciben muchas reseñas para tener estadísticas ricas
+		List<Producto> productosDestacados = productos.subList(0, Math.min(10, productos.size()));
+
+		// 100 reseñas concentradas en los 10 primeros productos
+		for (int i = 0; i < 100; i++) {
 			Resena r = new Resena();
 			r.setTitulo(titulos[random.nextInt(titulos.length)]);
 			r.setComentario(comentarios[random.nextInt(comentarios.length)]);
 			r.setFecha(LocalDate.now().minusDays(random.nextInt(180)));
+			r.setPuntuacion(puntuacionesPosibles[random.nextInt(puntuacionesPosibles.length)]);
+			r.setUsuario(usuarios.get(random.nextInt(usuarios.size())));
+			r.setProducto(productosDestacados.get(i % productosDestacados.size()));
+			resenaRepository.save(r);
+		}
+
+		// 100 reseñas repartidas entre todos los productos
+		for (int i = 0; i < 100; i++) {
+			Resena r = new Resena();
+			r.setTitulo(titulos[random.nextInt(titulos.length)]);
+			r.setComentario(comentarios[random.nextInt(comentarios.length)]);
+			r.setFecha(LocalDate.now().minusDays(random.nextInt(180)));
+			r.setPuntuacion(puntuacionesPosibles[random.nextInt(puntuacionesPosibles.length)]);
 			r.setUsuario(usuarios.get(random.nextInt(usuarios.size())));
 			r.setProducto(productos.get(random.nextInt(productos.size())));
 			resenaRepository.save(r);
@@ -503,9 +523,12 @@ public class DataInitializer implements CommandLineRunner {
 		System.out.println("   - 31 usuarios (1 admin + 30 usuarios)");
 		System.out.println("   - 20 categorías");
 		System.out.println("   - " + productos.size() + " productos");
-		System.out.println("   - 150 reseñas");
+		System.out.println("   - 200 reseñas (100 concentradas en los 10 primeros productos)");
 		System.out.println("   - 100 comentarios");
 		System.out.println("   - Suscripciones y pagos para todos los usuarios");
+		System.out.println("   ► Productos con más datos: iPhone 15 Pro, iPhone 14, Samsung Galaxy S24 Ultra,");
+		System.out.println("     Google Pixel 8 Pro, MacBook Air M3, MacBook Pro 16, Dell XPS 15,");
+		System.out.println("     Microsoft Surface Pro 9, Zelda TOTK, PlayStation 5");
 	}
 
 	// ==========================

@@ -1,72 +1,86 @@
-<!-- src/app/home/home.component.html -->
 <div class="min-h-screen bg-gray-50">
 
   <!-- Navbar -->
   <nav class="sticky top-0 bg-white shadow py-3 z-50">
-    <div class="container mx-auto px-4 flex items-center justify-between">
-      <a href="#" class="flex items-center space-x-3">
-        <span class="bg-blue-600 text-white text-2xl font-bold px-3 py-2 rounded">R</span>
-        <span class="font-bold text-lg text-black">Reviewmeter</span>
-      </a>
-      <form class="flex-1 mx-4 relative" (submit)="$event.preventDefault()">
-        <input
-          type="search"
-          placeholder="Buscar productos, marcas o categorías..."
-          class="w-full border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          name="busqueda"
-          [(ngModel)]="terminoBusqueda"
-          (input)="buscar()"
-          (blur)="cerrarDropdown()"
-        >
-        <!-- Dropdown resultados -->
-        <div *ngIf="mostrarDropdown && resultadosBusqueda.length > 0"
-             class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
-          <div *ngFor="let p of resultadosBusqueda"
-               (mousedown)="irAProducto(p)"
-               class="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-0">
-            <img [src]="p.imageUrl" [alt]="p.nombre" class="w-20 h-20 object-contain rounded">
-            <div>
-              <p class="font-semibold text-gray-800 text-2xl">{{ p.nombre }}</p>
-              <p class="text-2xl text-gray-400">{{ p.marca }} · {{ p.categoria?.nombre }}</p>
+    <div class="container mx-auto px-4">
+      <div class="flex items-center justify-between gap-3">
+
+        <!-- Logo -->
+        <a href="#" class="flex items-center space-x-2 shrink-0">
+          <span class="bg-blue-600 text-white text-xl font-bold px-2.5 py-1.5 rounded">R</span>
+          <span class="font-bold text-base text-black hidden sm:inline">Reviewmeter</span>
+        </a>
+
+        <!-- Buscador -->
+        <form class="flex-1 relative min-w-0" (submit)="$event.preventDefault()">
+          <input
+            type="search"
+            placeholder="Buscar productos..."
+            class="w-full border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            name="busqueda"
+            [(ngModel)]="terminoBusqueda"
+            (input)="buscar()"
+            (blur)="cerrarDropdown()"
+          >
+          <!-- Dropdown resultados -->
+          <div *ngIf="mostrarDropdown && resultadosBusqueda.length > 0"
+               class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
+            <div *ngFor="let p of resultadosBusqueda"
+                 (mousedown)="irAProducto(p)"
+                 class="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-0">
+              <img [src]="p.imageUrl" [alt]="p.nombre" class="w-10 h-10 object-contain rounded shrink-0">
+              <div class="min-w-0">
+                <p class="font-semibold text-gray-800 text-sm truncate">{{ p.nombre }}</p>
+                <p class="text-xs text-gray-400 truncate">{{ p.marca }} · {{ p.categoria?.nombre }}</p>
+              </div>
             </div>
           </div>
+          <!-- Sin resultados -->
+          <div *ngIf="mostrarDropdown && resultadosBusqueda.length === 0 && terminoBusqueda.length > 0"
+               class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 px-4 py-3 text-sm text-gray-500">
+            No se encontraron productos para "{{ terminoBusqueda }}"
+          </div>
+        </form>
+
+        <!-- Botones auth -->
+        <div class="flex items-center gap-2 shrink-0">
+          <ng-container *ngIf="estaLogueado(); else loginBtn">
+            <button routerLink="/profile"
+              class="border border-blue-600 text-blue-600 px-3 py-2 rounded-full flex items-center gap-1.5 hover:bg-blue-50 transition text-sm font-medium">
+              <i class="bi bi-person-circle"></i>
+              <span class="hidden sm:inline">Perfil</span>
+            </button>
+            <button (click)="logout()"
+              class="bg-red-500 text-white px-3 py-2 rounded-full flex items-center gap-1.5 hover:bg-red-600 transition text-sm font-medium">
+              <i class="bi bi-box-arrow-right"></i>
+              <span class="hidden sm:inline">Salir</span>
+            </button>
+          </ng-container>
+          <ng-template #loginBtn>
+            <button routerLink="/login"
+              class="bg-blue-600 text-white px-3 py-2 rounded-full flex items-center gap-1.5 hover:bg-blue-700 transition text-sm font-medium">
+              <i class="bi bi-person"></i>
+              <span class="hidden sm:inline">Iniciar sesión</span>
+            </button>
+          </ng-template>
         </div>
-        <!-- Sin resultados -->
-        <div *ngIf="mostrarDropdown && resultadosBusqueda.length === 0 && terminoBusqueda.length > 0"
-             class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 px-4 py-3 text-sm text-gray-500">
-          No se encontraron productos para "{{ terminoBusqueda }}"
-        </div>
-      </form>
-      <div class="flex items-center space-x-3">
-        <ng-container *ngIf="estaLogueado(); else loginBtn">
-          <button routerLink="/profile"
-            class="border border-blue-600 text-blue-600 px-4 py-2 rounded-full flex items-center gap-2 hover:bg-blue-50 transition">
-            <i class="bi bi-person-circle"></i> Perfil
-          </button>
-          <button (click)="logout()"
-            class="bg-red-500 text-white px-4 py-2 rounded-full flex items-center gap-2 hover:bg-red-600 transition">
-            <i class="bi bi-box-arrow-right"></i> Cerrar sesión
-          </button>
-        </ng-container>
-        <ng-template #loginBtn>
-          <button routerLink="/login"
-            class="bg-blue-600 text-white px-4 py-2 rounded-full flex items-center gap-2 hover:bg-blue-700 transition">
-            <i class="bi bi-person"></i> Iniciar sesión
-          </button>
-        </ng-template>
+
       </div>
     </div>
   </nav>
 
   <!-- Hero -->
-  <section class="bg-blue-600 text-white py-20">
+  <section class="bg-blue-600 text-white py-14 md:py-20">
     <div class="container mx-auto px-4">
-      <h1 class="text-4xl md:text-5xl font-bold leading-tight">Descubre reseñas auténticas<br>de productos</h1>
-      <p class="mt-4 text-lg md:text-xl">Más de 10 millones de opiniones verificadas para ayudarte a tomar la mejor
-        decisión de compra.</p>
-      <div class="mt-6 flex flex-wrap gap-4">
+      <h1 class="text-3xl md:text-5xl font-bold leading-tight">
+        Descubre reseñas auténticas<br class="hidden md:block"> de productos
+      </h1>
+      <p class="mt-4 text-base md:text-xl text-blue-100 max-w-2xl">
+        Más de 10 millones de opiniones verificadas para ayudarte a tomar la mejor decisión de compra.
+      </p>
+      <div class="mt-6">
         <button routerLink="/categorias"
-          class="bg-white text-blue-600 px-8 py-3 rounded-full font-semibold hover:bg-blue-400 transition">
+          class="bg-white text-blue-600 px-6 py-3 rounded-full font-semibold hover:bg-blue-50 transition text-sm md:text-base">
           Explorar categorías
         </button>
       </div>
@@ -74,46 +88,45 @@
   </section>
 
   <!-- Stats -->
-  <section class="py-16 bg-white">
-    <div class="container mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-      <div class="bg-blue-600 border rounded-md text-white py-3">
-        <h3 class="text-3xl font-bold">10M+</h3>
-        <p>Reseñas publicadas</p>
+  <section class="py-10 bg-white">
+    <div class="container mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+      <div class="bg-blue-600 rounded-xl text-white py-4 px-2">
+        <h3 class="text-2xl md:text-3xl font-bold">10M+</h3>
+        <p class="text-sm mt-1">Reseñas publicadas</p>
       </div>
-      <div class="bg-blue-600 border rounded-md text-white py-3">
-        <h3 class="text-3xl font-bold">50K+</h3>
-        <p>Productos evaluados</p>
+      <div class="bg-blue-600 rounded-xl text-white py-4 px-2">
+        <h3 class="text-2xl md:text-3xl font-bold">50K+</h3>
+        <p class="text-sm mt-1">Productos evaluados</p>
       </div>
-      <div class="bg-blue-600 border rounded-md text-white py-3">
-        <h3 class="text-3xl font-bold">5M+</h3>
-        <p>Usuarios activos</p>
+      <div class="bg-blue-600 rounded-xl text-white py-4 px-2">
+        <h3 class="text-2xl md:text-3xl font-bold">5M+</h3>
+        <p class="text-sm mt-1">Usuarios activos</p>
       </div>
-      <div class="bg-blue-600 border rounded-md text-white py-3">
-        <h3 class="text-3xl font-bold">100%</h3>
-        <p>Verificadas</p>
+      <div class="bg-blue-600 rounded-xl text-white py-4 px-2">
+        <h3 class="text-2xl md:text-3xl font-bold">100%</h3>
+        <p class="text-sm mt-1">Verificadas</p>
       </div>
     </div>
   </section>
 
-  <!-- Sección de productos: Tecnología -->
-  <section class="py-16 bg-gray-50">
+  <!-- Sección Tecnología -->
+  <section class="py-10 bg-gray-50">
     <div class="container mx-auto px-4">
-      <div class="flex justify-between items-center mb-6">
-        <h3 class="text-2xl font-bold">Tecnología</h3>
-        <a [routerLink]="['/categoria', 1, 'Tecnología']" class="text-blue-600 font-semibold hover:underline cursor-pointer">Ver más →</a>
+      <div class="flex justify-between items-center mb-5">
+        <h3 class="text-xl md:text-2xl font-bold">Tecnología</h3>
+        <a [routerLink]="['/categoria', 1, 'Tecnología']" class="text-blue-600 text-sm font-semibold hover:underline">Ver más →</a>
       </div>
-      <div class="flex gap-6 overflow-x-auto pb-4 scroll-smooth snap-x">
-        <div class="min-w-[250px] bg-white rounded-lg shadow p-4 snap-start" *ngFor="let t of listaTecnologia">
-          <img [src]="t.imageUrl" class="rounded mb-3 w-full h-48 object-cover" [alt]="t.imageUrl">
-          <h6 class="font-bold mb-1">{{ t.nombre }}</h6>
-          <div class="flex items-center mb-2">
-            <span *ngFor="let estrella of getEstrellas(t.valoracion)">
-              {{ estrella === 1 ? '★' : '☆' }}
-            </span>
-            <small class="ml-2 text-gray-500">{{ t.marca }} ({{ t.fechaLanzamiento }})</small>
+      <div class="flex gap-4 overflow-x-auto pb-3 scroll-smooth snap-x scrollbar-hide">
+        <div class="min-w-[200px] sm:min-w-[220px] bg-white rounded-xl shadow-sm border border-gray-100 p-4 snap-start flex flex-col"
+             *ngFor="let t of listaTecnologia">
+          <img [src]="t.imageUrl" class="rounded-lg mb-3 w-full h-36 object-contain bg-gray-50" [alt]="t.nombre">
+          <h6 class="font-bold text-sm mb-1 line-clamp-2 flex-1">{{ t.nombre }}</h6>
+          <div class="flex items-center gap-1 mb-1 text-yellow-400 text-sm">
+            <span *ngFor="let estrella of getEstrellas(t.valoracion)">{{ estrella === 1 ? '★' : '☆' }}</span>
           </div>
+          <p class="text-xs text-gray-400 mb-3">{{ t.marca }}</p>
           <button [routerLink]="['/producto', t.idProducto]"
-            class="w-full bg-blue-600 text-white py-2 rounded-full hover:bg-blue-700 transition">
+            class="w-full bg-blue-600 text-white py-2 rounded-full hover:bg-blue-700 transition text-sm font-medium">
             Ver detalles
           </button>
         </div>
@@ -121,69 +134,24 @@
     </div>
   </section>
 
-  <!-- Sección de productos: Juegos -->
-  <section class="py-16 bg-white">
+  <!-- Sección Juegos -->
+  <section class="py-10 bg-white">
     <div class="container mx-auto px-4">
-      <div class="flex justify-between items-center mb-6">
-        <h3 class="text-2xl font-bold">Juegos</h3>
-        <a [routerLink]="['/categoria', 2, 'Juegos']" class="text-blue-600 font-semibold hover:underline cursor-pointer">Ver más →</a>
+      <div class="flex justify-between items-center mb-5">
+        <h3 class="text-xl md:text-2xl font-bold">Juegos</h3>
+        <a [routerLink]="['/categoria', 2, 'Juegos']" class="text-blue-600 text-sm font-semibold hover:underline">Ver más →</a>
       </div>
-      <div class="flex gap-6 overflow-x-auto pb-4 scroll-smooth snap-x">
-        <div class="min-w-[250px] bg-white rounded-lg shadow p-4 snap-start" *ngFor="let j of listaJuegos">
-          <img [src]="j.imageUrl" class="rounded mb-3 w-full h-48 object-cover" [alt]="j.imageUrl">
-          <h6 class="font-bold mb-1">{{ j.nombre }}</h6>
-          <small class="text-gray-500">{{ j.marca }} reseñas</small>
-          <span *ngFor="let estrella of getEstrellas(j.valoracion)">
-            {{ estrella === 1 ? '★' : '☆' }}
-          </span>
-          <button class="w-full bg-blue-600 text-white py-2 mt-2 rounded-full hover:bg-blue-700 transition">
-            Ver detalles
-          </button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Sección de productos: Libros -->
-  <section class="py-16 bg-gray-50">
-    <div class="container mx-auto px-4">
-      <div class="flex justify-between items-center mb-6">
-        <h3 class="text-2xl font-bold">Libros</h3>
-        <a [routerLink]="['/categoria', 3, 'Libros']" class="text-blue-600 font-semibold hover:underline cursor-pointer">Ver más →</a>
-      </div>
-      <div class="flex gap-6 overflow-x-auto pb-4 scroll-smooth snap-x">
-        <div class="min-w-[250px] bg-white rounded-lg shadow p-4 snap-start" *ngFor="let l of listaLibros">
-          <img [src]="l.imageUrl" class="rounded mb-3 w-full h-48 object-cover" [alt]="l.imageUrl">
-          <h6 class="font-bold mb-1">{{ l.nombre }}</h6>
-          <small class="text-gray-500">{{ l.marca }}</small>
-          <span *ngFor="let estrella of getEstrellas(l.valoracion)">
-            {{ estrella === 1 ? '★' : '☆' }}
-          </span>
-          <button class="w-full bg-blue-600 text-white py-2 mt-2 rounded-full hover:bg-blue-700 transition">
-            Ver detalles
-          </button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Sección de productos: Electrónica -->
-  <section class="py-16 bg-white">
-    <div class="container mx-auto px-4">
-      <div class="flex justify-between items-center mb-6">
-        <h3 class="text-2xl font-bold">Electrónica</h3>
-        <a [routerLink]="['/categoria', 4, 'Electrónica']" class="text-blue-600 font-semibold hover:underline cursor-pointer">Ver más →</a>
-      </div>
-      <div class="flex gap-6 overflow-x-auto pb-4 scroll-smooth snap-x">
-        <div class="min-w-[250px] bg-white rounded-lg shadow p-4 snap-start" *ngFor="let e of listaElectronica">
-          <img [src]="e.imageUrl" class="rounded mb-3 w-full h-48 object-cover" [alt]="e.imageUrl">
-          <h6 class="font-bold mb-1">{{ e.nombre }}</h6>
-          <div class="flex items-center mb-2">
-            <span *ngFor="let estrella of getEstrellas(e.valoracion)">
-              {{ estrella === 1 ? '★' : '☆' }}
-            </span>
+      <div class="flex gap-4 overflow-x-auto pb-3 scroll-smooth snap-x scrollbar-hide">
+        <div class="min-w-[200px] sm:min-w-[220px] bg-white rounded-xl shadow-sm border border-gray-100 p-4 snap-start flex flex-col"
+             *ngFor="let j of listaJuegos">
+          <img [src]="j.imageUrl" class="rounded-lg mb-3 w-full h-36 object-contain bg-gray-50" [alt]="j.nombre">
+          <h6 class="font-bold text-sm mb-1 line-clamp-2 flex-1">{{ j.nombre }}</h6>
+          <div class="flex items-center gap-1 mb-1 text-yellow-400 text-sm">
+            <span *ngFor="let estrella of getEstrellas(j.valoracion)">{{ estrella === 1 ? '★' : '☆' }}</span>
           </div>
-          <button class="w-full bg-blue-600 text-white py-2 rounded-full hover:bg-blue-700 transition">
+          <p class="text-xs text-gray-400 mb-3">{{ j.marca }}</p>
+          <button [routerLink]="['/producto', j.idProducto]"
+            class="w-full bg-blue-600 text-white py-2 rounded-full hover:bg-blue-700 transition text-sm font-medium">
             Ver detalles
           </button>
         </div>
@@ -191,21 +159,74 @@
     </div>
   </section>
 
-  <!-- Sección de productos: Moda -->
-  <section class="py-16 bg-gray-50">
+  <!-- Sección Libros -->
+  <section class="py-10 bg-gray-50">
     <div class="container mx-auto px-4">
-      <div class="flex justify-between items-center mb-6">
-        <h3 class="text-2xl font-bold">Moda</h3>
-        <a [routerLink]="['/categoria', 5, 'Moda']" class="text-blue-600 font-semibold hover:underline cursor-pointer">Ver más →</a>
+      <div class="flex justify-between items-center mb-5">
+        <h3 class="text-xl md:text-2xl font-bold">Libros</h3>
+        <a [routerLink]="['/categoria', 3, 'Libros']" class="text-blue-600 text-sm font-semibold hover:underline">Ver más →</a>
       </div>
-      <div class="flex gap-6 overflow-x-auto pb-4 scroll-smooth snap-x">
-        <div class="min-w-[250px] bg-white rounded-lg shadow p-4 snap-start" *ngFor="let m of listaModa">
-          <img [src]="m.imageUrl" class="rounded mb-3 w-full h-48 object-cover" [alt]="m.imageUrl">
-          <h6 class="font-bold mb-1">{{ m.nombre }}</h6>
-          <span *ngFor="let estrella of getEstrellas(m.valoracion)">
-            {{ estrella === 1 ? '★' : '☆' }}
-          </span>
-          <button class="w-full bg-blue-600 text-white py-2 mt-2 rounded-full hover:bg-blue-700 transition">
+      <div class="flex gap-4 overflow-x-auto pb-3 scroll-smooth snap-x scrollbar-hide">
+        <div class="min-w-[200px] sm:min-w-[220px] bg-white rounded-xl shadow-sm border border-gray-100 p-4 snap-start flex flex-col"
+             *ngFor="let l of listaLibros">
+          <img [src]="l.imageUrl" class="rounded-lg mb-3 w-full h-36 object-contain bg-gray-50" [alt]="l.nombre">
+          <h6 class="font-bold text-sm mb-1 line-clamp-2 flex-1">{{ l.nombre }}</h6>
+          <div class="flex items-center gap-1 mb-1 text-yellow-400 text-sm">
+            <span *ngFor="let estrella of getEstrellas(l.valoracion)">{{ estrella === 1 ? '★' : '☆' }}</span>
+          </div>
+          <p class="text-xs text-gray-400 mb-3">{{ l.marca }}</p>
+          <button [routerLink]="['/producto', l.idProducto]"
+            class="w-full bg-blue-600 text-white py-2 rounded-full hover:bg-blue-700 transition text-sm font-medium">
+            Ver detalles
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección Electrónica -->
+  <section class="py-10 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="flex justify-between items-center mb-5">
+        <h3 class="text-xl md:text-2xl font-bold">Electrónica</h3>
+        <a [routerLink]="['/categoria', 4, 'Electrónica']" class="text-blue-600 text-sm font-semibold hover:underline">Ver más →</a>
+      </div>
+      <div class="flex gap-4 overflow-x-auto pb-3 scroll-smooth snap-x scrollbar-hide">
+        <div class="min-w-[200px] sm:min-w-[220px] bg-white rounded-xl shadow-sm border border-gray-100 p-4 snap-start flex flex-col"
+             *ngFor="let e of listaElectronica">
+          <img [src]="e.imageUrl" class="rounded-lg mb-3 w-full h-36 object-contain bg-gray-50" [alt]="e.nombre">
+          <h6 class="font-bold text-sm mb-1 line-clamp-2 flex-1">{{ e.nombre }}</h6>
+          <div class="flex items-center gap-1 mb-1 text-yellow-400 text-sm">
+            <span *ngFor="let estrella of getEstrellas(e.valoracion)">{{ estrella === 1 ? '★' : '☆' }}</span>
+          </div>
+          <p class="text-xs text-gray-400 mb-3">{{ e.marca }}</p>
+          <button [routerLink]="['/producto', e.idProducto]"
+            class="w-full bg-blue-600 text-white py-2 rounded-full hover:bg-blue-700 transition text-sm font-medium">
+            Ver detalles
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección Moda -->
+  <section class="py-10 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <div class="flex justify-between items-center mb-5">
+        <h3 class="text-xl md:text-2xl font-bold">Moda</h3>
+        <a [routerLink]="['/categoria', 5, 'Moda']" class="text-blue-600 text-sm font-semibold hover:underline">Ver más →</a>
+      </div>
+      <div class="flex gap-4 overflow-x-auto pb-3 scroll-smooth snap-x scrollbar-hide">
+        <div class="min-w-[200px] sm:min-w-[220px] bg-white rounded-xl shadow-sm border border-gray-100 p-4 snap-start flex flex-col"
+             *ngFor="let m of listaModa">
+          <img [src]="m.imageUrl" class="rounded-lg mb-3 w-full h-36 object-contain bg-gray-50" [alt]="m.nombre">
+          <h6 class="font-bold text-sm mb-1 line-clamp-2 flex-1">{{ m.nombre }}</h6>
+          <div class="flex items-center gap-1 mb-1 text-yellow-400 text-sm">
+            <span *ngFor="let estrella of getEstrellas(m.valoracion)">{{ estrella === 1 ? '★' : '☆' }}</span>
+          </div>
+          <p class="text-xs text-gray-400 mb-3">{{ m.marca }}</p>
+          <button [routerLink]="['/producto', m.idProducto]"
+            class="w-full bg-blue-600 text-white py-2 rounded-full hover:bg-blue-700 transition text-sm font-medium">
             Ver detalles
           </button>
         </div>
@@ -214,53 +235,49 @@
   </section>
 
   <!-- Footer -->
-  <footer class="bg-gray-800 text-white py-12">
-    <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
+  <footer class="bg-gray-800 text-white py-10">
+    <div class="container mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
       <div>
         <h5 class="font-bold mb-3">Sobre nosotros</h5>
-        <p class="text-sm">Reviewmeter es tu plataforma de confianza para descubrir opiniones auténticas sobre
-          productos.
-          Ayudamos a millones de usuarios a tomar mejores decisiones de compra.</p>
+        <p class="text-sm text-gray-400">Reviewmeter es tu plataforma de confianza para descubrir opiniones auténticas sobre productos.</p>
       </div>
       <div>
         <h5 class="font-bold mb-3">Políticas</h5>
-        <ul class="space-y-1 text-sm">
-          <li><a href="#" class="hover:text-gray-300">Política de Privacidad</a></li>
-          <li><a href="#" class="hover:text-gray-300">Términos y Condiciones</a></li>
-          <li><a href="#" class="hover:text-gray-300">Política de Cookies</a></li>
-          <li><a href="#" class="hover:text-gray-300">Normas de la comunidad</a></li>
-          <li><a href="#" class="hover:text-gray-300">Directrices de reseñas</a></li>
+        <ul class="space-y-1 text-sm text-gray-400">
+          <li><a href="#" class="hover:text-white transition">Política de Privacidad</a></li>
+          <li><a href="#" class="hover:text-white transition">Términos y Condiciones</a></li>
+          <li><a href="#" class="hover:text-white transition">Política de Cookies</a></li>
+          <li><a href="#" class="hover:text-white transition">Normas de la comunidad</a></li>
         </ul>
       </div>
       <div>
         <h5 class="font-bold mb-3">Contacto</h5>
-        <ul class="space-y-1 text-sm">
-          <li><a href="#" class="hover:text-gray-300">Centro de ayuda</a></li>
-          <li><a href="#" class="hover:text-gray-300">Soporte técnico</a></li>
-          <li><a href="#" class="hover:text-gray-300"><i class="bi bi-envelope me-2"></i> contacto@reviewhub.com</a>
-          </li>
-          <li><a href="#" class="hover:text-gray-300">Para empresas</a></li>
-          <li><a href="#" class="hover:text-gray-300">Trabaja con nosotros</a></li>
+        <ul class="space-y-1 text-sm text-gray-400">
+          <li><a href="#" class="hover:text-white transition">Centro de ayuda</a></li>
+          <li><a href="#" class="hover:text-white transition">Soporte técnico</a></li>
+          <li><a href="#" class="hover:text-white transition">contacto&#64;reviewmeter.com</a></li>
+          <li><a href="#" class="hover:text-white transition">Para empresas</a></li>
         </ul>
       </div>
       <div>
         <h5 class="font-bold mb-3">Síguenos</h5>
-        <p class="text-sm mb-2">Mantente al día con las últimas novedades y reseñas.</p>
-        <div class="flex gap-2 text-xl">
-          <a href="#" class="hover:text-blue-400"><i class="bi bi-facebook"></i></a>
-          <a href="#" class="hover:text-blue-400"><i class="bi bi-twitter"></i></a>
-          <a href="#" class="hover:text-pink-400"><i class="bi bi-instagram"></i></a>
-          <a href="#" class="hover:text-blue-600"><i class="bi bi-linkedin"></i></a>
+        <p class="text-sm text-gray-400 mb-3">Mantente al día con las últimas novedades.</p>
+        <div class="flex gap-3 text-xl">
+          <a href="#" class="hover:text-blue-400 transition"><i class="bi bi-facebook"></i></a>
+          <a href="#" class="hover:text-blue-400 transition"><i class="bi bi-twitter"></i></a>
+          <a href="#" class="hover:text-pink-400 transition"><i class="bi bi-instagram"></i></a>
+          <a href="#" class="hover:text-blue-600 transition"><i class="bi bi-linkedin"></i></a>
         </div>
       </div>
     </div>
-    <div class="mt-8 border-t border-gray-700 pt-4 text-sm text-gray-400 flex flex-col md:flex-row justify-between">
-      <span>© 2026 ReviewHub. Todos los derechos reservados.</span>
-      <span class="mt-2 md:mt-0 flex gap-4">
+    <div class="mt-8 border-t border-gray-700 pt-4 text-xs text-gray-500 container mx-auto px-4 flex flex-col sm:flex-row justify-between gap-2">
+      <span>© 2026 Reviewmeter. Todos los derechos reservados.</span>
+      <span class="flex gap-4">
         <a href="#" class="hover:text-gray-300">Accesibilidad</a>
         <a href="#" class="hover:text-gray-300">Mapa del sitio</a>
         <a href="#" class="hover:text-gray-300">Legal</a>
       </span>
     </div>
   </footer>
+
 </div>

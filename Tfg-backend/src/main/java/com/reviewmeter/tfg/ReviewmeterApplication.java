@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ReviewmerterApplication {
+public class ReviewmeterApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ReviewmerterApplication.class, args);
+		SpringApplication.run(ReviewmeterApplication.class, args);
 	}
 
 }

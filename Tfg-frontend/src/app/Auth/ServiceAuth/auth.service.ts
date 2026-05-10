@@ -32,6 +32,22 @@ export class AuthServiceTs {
     localStorage.removeItem('token');
   }
 
+  /** Extrae el rol del payload del JWT sin librería externa */
+  getRol(): string | null {
+    const token = this.getToken();
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.rol ?? null;
+    } catch {
+      return null;
+    }
+  }
+
+  isAdmin(): boolean {
+    return this.getRol() === 'ADMIN';
+  }
+
   getUserProfile() {
     const token = this.getToken();
     if (!token) return null;

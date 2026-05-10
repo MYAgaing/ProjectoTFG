@@ -8,6 +8,7 @@ import { Resena } from '../Model/resenaModel.Model';
 import { ResenaService } from '../Services/resena-service';
 import { AuthServiceTs } from '../Auth/ServiceAuth/auth.service';
 import { FavoritoService } from '../Services/favorito-service';
+import { ReporteService } from '../Services/reporte-service';
 
 @Component({
   selector: 'app-producto-detalle',
@@ -42,11 +43,21 @@ export class ProductoDetalle implements OnInit {
   esFavorito = false;
   cargandoFavorito = false;
 
+  // Reporte
+  mostrarModalReporte = false;
+  resenaAReportar: any = null;
+  motivoReporte = 'INAPROPIADA';
+  descripcionReporte = '';
+  enviandoReporte = false;
+  mensajeReporte = '';
+  resenasReportadas = new Set<number>(); // IDs de reseñas ya reportadas por el usuario
+
   constructor(
     private route: ActivatedRoute,
     private sProducto: ProductoService,
     private sResena: ResenaService,
     private sFavorito: FavoritoService,
+    private sReporte: ReporteService,
     public auth: AuthServiceTs,
     private router: Router
   ) {}
@@ -153,5 +164,43 @@ export class ProductoDetalle implements OnInit {
       },
       error: () => this.cargandoFavorito = false
     });
+  }
+
+  // --- Reporte ---
+  abrirModalReporte(resena: any): void {
+    if (!this.estaLogueado()) { this.router.navigate(['/login']); return; }
+    this.resenaAReportar = resena;
+    this.motivoReporte = 'INAPROPIADA';
+    this.descripcionReporte = '';
+    this.mensajeReporte = '';
+    this.mostrarModalReporte = true;
+  }
+
+  cerrarModalReporte(): void {
+    this.mostrarModalReporte = false;
+    this.resenaAReportar = null;
+  }
+
+  enviarReporte(): void {
+    if (!this.resenaAReportar || !this.resenaAReportar.idResena) return;
+    this.enviandoReporte = true;
+    this.sReporte.reportar(this.resenaAReportar.idResena, this.motivoReporte, this.descripcionReporte).subscribe({
+      next: () => {
+        this.resenasReportadas.add(this.resenaAReportar.idResena);
+        this.enviandoReporte = false;
+        this.cerrarModalReporte();
+      },
+      error: (err) => {
+        this.mensajeReporte = err.status === 409
+          ? 'Ya has reportado esta reseña anteriormente.'
+          : 'Error al enviar el reporte. Inténtalo de nuevo.';
+        this.enviandoReporte = false;
+      }
+    });
+  }
+
+  yaReporto(idResena: number | undefined): boolean {
+    if (idResena === undefined) return false;
+    return this.resenasReportadas.has(idResena);
   }
 }

@@ -4,13 +4,11 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod; // Importante para definir métodos
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -27,37 +25,34 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-            .csrf(csrf -> csrf.disable()) 
-            // 1. Configuramos CORS explícitamente usando nuestro bean
+            .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session ->
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-            		.requestMatchers("/error").permitAll()
-                    // Permitir preflight (OPTIONS) para evitar bloqueos CORS
+                    .requestMatchers("/error").permitAll()
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                    
-                    // Endpoints públicos
+
                     .requestMatchers("/auth/**").permitAll()
-                    
-                    // Categorias, Productos y Reseñas (Lectura pública)
+
                     .requestMatchers(HttpMethod.GET, "/api/categorias/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
-                    // mis-resenas requiere auth — debe ir ANTES de la regla pública de GET
                     .requestMatchers(HttpMethod.GET, "/api/resenas/mis-resenas").authenticated()
                     .requestMatchers(HttpMethod.GET, "/api/resenas/**").permitAll()
-                    
-                    // Admin
-                    .requestMatchers("/admin/**").hasRole("ADMIN")
-                    
-                    // Usuario logueado
+
+                    .requestMatchers(HttpMethod.GET,    "/admin/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.POST,   "/admin/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.PUT,    "/admin/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.DELETE, "/admin/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.PATCH,  "/admin/**").hasRole("ADMIN")
+
+                    .requestMatchers("/api/reportes/**").authenticated()
+
                     .requestMatchers("/usuario/me").hasAnyRole("USER", "ADMIN")
                     .requestMatchers(HttpMethod.PATCH, "/usuario/me").hasAnyRole("USER", "ADMIN")
-                    
-                    // Favoritos (requieren auth, el controller extrae el usuario del token)
+
                     .requestMatchers("/api/favoritos/**").authenticated()
-                    
-                    // El resto de peticiones (POST, PUT, DELETE) requieren auth
+
                     .anyRequest().authenticated()
             );
 
@@ -75,16 +70,14 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Asegúrate de que esta URL es EXACTAMENTE la de tu Angular (sin / al final)
         configuration.setAllowedOrigins(List.of(
-        	    "http://localhost:4200",
-        	    "https://lively-imagination-production-0c1a.up.railway.app"
-        	));
+                "http://localhost:4200",
+                "https://lively-imagination-production-0c1a.up.railway.app"
+        ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept"));
         configuration.setAllowCredentials(true);
-        // Tiempo que el navegador guarda la configuración CORS (opcional)
-        configuration.setMaxAge(3600L); 
+        configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

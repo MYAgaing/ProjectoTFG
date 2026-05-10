@@ -1,91 +1,112 @@
 <div class="min-h-screen bg-gray-50" *ngIf="product">
 
+  <!-- Navbar -->
   <nav class="sticky top-0 bg-white shadow py-3 z-50">
-    <div class="container mx-auto px-4 flex items-center justify-between">
-      <a routerLink="/" class="flex items-center space-x-3">
-        <span class="bg-blue-600 text-white text-2xl font-bold px-3 py-2 rounded">R</span>
-        <span class="font-bold text-lg">Reviewmeter</span>
-      </a>
-      <div class="flex-1 mx-8 hidden md:block">
-        <input type="search" placeholder="Buscar productos..." class="w-full border rounded-full px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
-      </div>
-      <div class="flex items-center space-x-3">
-        <ng-container *ngIf="estaLogueado(); else loginBtn">
-          <button routerLink="/profile"
-            class="border border-blue-600 text-blue-600 px-5 py-2 rounded-full flex items-center gap-2 hover:bg-blue-50 transition font-medium">
-            <i class="bi bi-person-circle"></i> Perfil
-          </button>
-          <button (click)="logout()"
-            class="bg-red-500 text-white px-5 py-2 rounded-full flex items-center gap-2 hover:bg-red-600 transition font-medium">
-            <i class="bi bi-box-arrow-right"></i> Cerrar sesión
-          </button>
-        </ng-container>
-        <ng-template #loginBtn>
-          <button routerLink="/login"
-            class="bg-blue-600 text-white px-5 py-2 rounded-full font-medium hover:bg-blue-700">Iniciar Sesión</button>
-        </ng-template>
+    <div class="container mx-auto px-4">
+      <div class="flex items-center justify-between gap-3">
+
+        <a routerLink="/" class="flex items-center gap-2 shrink-0">
+          <span class="bg-blue-600 text-white text-xl font-bold px-2.5 py-1.5 rounded">R</span>
+          <span class="font-bold text-base hidden sm:inline">Reviewmeter</span>
+        </a>
+
+        <div class="flex-1 mx-2 hidden md:block">
+          <input type="search" placeholder="Buscar productos..."
+            class="w-full border rounded-full px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+
+        <div class="flex items-center gap-2 shrink-0">
+          <ng-container *ngIf="estaLogueado(); else loginBtn">
+            <button routerLink="/profile"
+              class="border border-blue-600 text-blue-600 px-3 py-2 rounded-full flex items-center gap-1.5 hover:bg-blue-50 transition text-sm font-medium">
+              <i class="bi bi-person-circle"></i>
+              <span class="hidden sm:inline">Perfil</span>
+            </button>
+            <button (click)="logout()"
+              class="bg-red-500 text-white px-3 py-2 rounded-full flex items-center gap-1.5 hover:bg-red-600 transition text-sm font-medium">
+              <i class="bi bi-box-arrow-right"></i>
+              <span class="hidden sm:inline">Salir</span>
+            </button>
+          </ng-container>
+          <ng-template #loginBtn>
+            <button routerLink="/login"
+              class="bg-blue-600 text-white px-3 py-2 rounded-full text-sm font-medium hover:bg-blue-700">
+              Iniciar Sesión
+            </button>
+          </ng-template>
+        </div>
+
       </div>
     </div>
   </nav>
 
-  <div class="container mx-auto px-4 py-4 text-sm text-gray-500">
-    <span>Inicio</span> › 
-    <span class="text-blue-600">{{ product.categoria?.nombre }}</span> › 
-    <span class="text-gray-800 font-semibold">{{ product.nombre }}</span>
+  <!-- Breadcrumb -->
+  <div class="container mx-auto px-4 py-3 text-xs sm:text-sm text-gray-500 flex flex-wrap gap-1 items-center">
+    <span>Inicio</span>
+    <span>›</span>
+    <span class="text-blue-600">{{ product.categoria?.nombre }}</span>
+    <span>›</span>
+    <span class="text-gray-800 font-semibold truncate max-w-[180px] sm:max-w-none">{{ product.nombre }}</span>
   </div>
 
-  <main class="container mx-auto px-4 py-6">
+  <main class="container mx-auto px-4 pb-10">
+
+    <!-- Ficha producto -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
       <div class="flex flex-col md:flex-row">
-        
-        <div class="md:w-1/2 bg-gray-50 p-8 flex items-center justify-center border-r border-gray-100">
-          <img [src]="product.imageUrl" [alt]="product.nombre" class="max-h-80 object-contain hover:scale-105 transition-transform duration-300">
+
+        <!-- Imagen -->
+        <div class="md:w-1/2 bg-gray-50 p-6 md:p-8 flex items-center justify-center border-b md:border-b-0 md:border-r border-gray-100 min-h-[220px]">
+          <img [src]="product.imageUrl" [alt]="product.nombre"
+               class="max-h-64 md:max-h-80 w-auto object-contain hover:scale-105 transition-transform duration-300">
         </div>
 
-        <div class="md:w-1/2 p-8">
+        <!-- Info -->
+        <div class="md:w-1/2 p-5 md:p-8">
           <div class="mb-4">
             <span class="bg-blue-50 text-blue-600 text-xs font-bold px-3 py-1 rounded-full uppercase">{{ product.marca }}</span>
-            <h1 class="text-3xl font-extrabold text-gray-900 mt-2">{{ product.nombre }}</h1>
+            <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 mt-2 leading-tight">{{ product.nombre }}</h1>
           </div>
 
-          <div class="flex items-center gap-4 mb-6">
+          <div class="flex flex-wrap items-center gap-3 mb-5">
             <div class="flex items-center bg-yellow-50 px-3 py-1 rounded-lg">
-              <span class="text-yellow-500 font-bold text-xl mr-1">★</span>
-              <span class="text-gray-800 font-bold text-lg">4.8</span>
+              <span class="text-yellow-500 font-bold text-lg mr-1">★</span>
+              <span class="text-gray-800 font-bold">4.8</span>
             </div>
-            <span class="text-gray-400 text-sm border-l pl-4">Lanzado el {{ product.fechaLanzamiento }}</span>
+            <span class="text-gray-400 text-sm">Lanzado el {{ product.fechaLanzamiento }}</span>
           </div>
 
-          <div class="mb-8">
-            <h3 class="text-gray-900 font-bold mb-2">Descripción del producto</h3>
-            <p class="text-gray-600 leading-relaxed">{{ product.descripcion }}</p>
+          <div class="mb-6">
+            <h3 class="text-gray-900 font-bold mb-2 text-sm md:text-base">Descripción del producto</h3>
+            <p class="text-gray-600 leading-relaxed text-sm md:text-base">{{ product.descripcion }}</p>
           </div>
 
-          <div class="flex flex-wrap gap-4">
+          <div class="flex flex-wrap gap-3">
             <button (click)="abrirModalResena()"
-              class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition flex items-center gap-2">
+              class="flex-1 sm:flex-none bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition flex items-center justify-center gap-2 text-sm">
               <i class="bi bi-pencil-square"></i> Escribir Reseña
             </button>
             <button (click)="toggleFavorito()" [disabled]="cargandoFavorito"
-              class="border px-8 py-3 rounded-xl font-bold transition flex items-center gap-2"
+              class="flex-1 sm:flex-none border px-5 py-2.5 rounded-xl font-bold transition flex items-center justify-center gap-2 text-sm"
               [class]="esFavorito
                 ? 'bg-red-50 border-red-300 text-red-500 hover:bg-red-100'
                 : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'">
               <i [class]="esFavorito ? 'bi bi-heart-fill' : 'bi bi-heart'"></i>
-              {{ esFavorito ? 'En favoritos' : 'Añadir a favoritos' }}
+              {{ esFavorito ? 'En favoritos' : 'Favoritos' }}
             </button>
           </div>
         </div>
+
       </div>
     </div>
 
-    <div class="mt-12">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <h2 class="text-2xl font-bold text-gray-900">Opiniones de la comunidad</h2>
-        <div class="flex flex-wrap gap-3">
-          <!-- Filtro por puntuación -->
+    <!-- Reseñas -->
+    <div class="mt-10">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <h2 class="text-xl md:text-2xl font-bold text-gray-900">Opiniones de la comunidad</h2>
+        <div class="flex flex-wrap gap-2">
           <select [(ngModel)]="filtroPuntuacion" (change)="aplicarFiltros()"
-            class="border border-gray-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+            class="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white flex-1 sm:flex-none">
             <option [value]="0">Todas las puntuaciones</option>
             <option [value]="5">5 estrellas</option>
             <option [value]="4">4+ estrellas</option>
@@ -93,10 +114,8 @@
             <option [value]="2">2+ estrellas</option>
             <option [value]="1">1+ estrellas</option>
           </select>
-          
-          <!-- Filtro por orden -->
           <select [(ngModel)]="filtroOrden" (change)="aplicarFiltros()"
-            class="border border-gray-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+            class="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white flex-1 sm:flex-none">
             <option value="">Más recientes</option>
             <option value="desc">Mejor puntuadas</option>
             <option value="asc">Peor puntuadas</option>
@@ -104,62 +123,75 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div *ngFor="let resena of listaResenasFiltradas" class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-          <div class="flex justify-between items-start mb-4">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        <div *ngFor="let resena of listaResenasFiltradas"
+             class="bg-white p-5 md:p-6 rounded-xl border border-gray-100 shadow-sm">
+          <div class="flex justify-between items-start mb-4 gap-2">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-9 h-9 md:w-10 md:h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
                 {{ resena.usuario?.nombre?.charAt(0) || 'U' }}
               </div>
-              <div>
-                <h4 class="font-bold text-gray-900">{{ resena.usuario?.nombre }}</h4>
+              <div class="min-w-0">
+                <h4 class="font-bold text-gray-900 text-sm truncate">{{ resena.usuario?.nombre }}</h4>
                 <p class="text-xs text-gray-400">{{ resena.fecha }}</p>
               </div>
             </div>
-            <div class="flex text-yellow-400">
-              <span *ngFor="let star of [1,2,3,4,5]">
-                {{ star <= resena.puntuacion ? '★' : '☆' }}
-              </span>
+            <div class="flex text-yellow-400 text-sm shrink-0">
+              <span *ngFor="let star of [1,2,3,4,5]">{{ star <= resena.puntuacion ? '★' : '☆' }}</span>
             </div>
           </div>
 
-          <h5 class="font-bold text-gray-800 mb-2">{{ resena.titulo }}</h5>
-          <p class="text-gray-600 text-sm leading-relaxed mb-4">
-            {{ resena.comentario }}
-          </p>
-          
-          <div class="flex items-center gap-4 pt-4 border-t border-gray-50">
-            <button class="text-gray-400 text-xs flex items-center gap-1 hover:text-blue-600">
+          <h5 class="font-bold text-gray-800 mb-1 text-sm md:text-base">{{ resena.titulo }}</h5>
+          <p class="text-gray-600 text-sm leading-relaxed mb-4">{{ resena.comentario }}</p>
+
+          <div class="pt-3 border-t border-gray-50 flex items-center justify-between">
+            <button class="text-gray-400 text-xs flex items-center gap-1 hover:text-blue-600 transition">
               <i class="bi bi-hand-thumbs-up"></i> ¿Es útil?
+            </button>
+            <!-- Botón reportar (solo si está logueado) -->
+            <button *ngIf="estaLogueado()"
+              (click)="abrirModalReporte(resena)"
+              [disabled]="yaReporto(resena.idResena)"
+              class="text-xs flex items-center gap-1 px-2.5 py-1 rounded-lg transition"
+              [class]="yaReporto(resena.idResena)
+                ? 'text-red-400 bg-red-50 cursor-not-allowed'
+                : 'text-gray-500 hover:text-red-500 hover:bg-red-50'"
+              [title]="yaReporto(resena.idResena) ? 'Ya has reportado esta reseña' : 'Reportar reseña'">
+              <i class="bi bi-slash-circle"></i>
+              {{ yaReporto(resena.idResena) ? 'Reportada' : 'Reportar' }}
             </button>
           </div>
         </div>
       </div>
 
-      <div *ngIf="listaResenasFiltradas?.length === 0" class="text-center py-20 bg-white rounded-2xl border-2 border-dashed border-gray-100">
-        <p class="text-gray-400">{{ filtroPuntuacion > 0 || filtroOrden ? 'No hay reseñas que coincidan con los filtros seleccionados.' : 'Este producto aún no tiene reseñas. ¡Sé el primero!' }}</p>
+      <div *ngIf="listaResenasFiltradas?.length === 0"
+           class="text-center py-16 bg-white rounded-2xl border-2 border-dashed border-gray-100 mt-4">
+        <i class="bi bi-chat-square-text text-3xl text-gray-300"></i>
+        <p class="text-gray-400 mt-3 text-sm">
+          {{ filtroPuntuacion > 0 || filtroOrden ? 'No hay reseñas que coincidan con los filtros.' : 'Este producto aún no tiene reseñas. ¡Sé el primero!' }}
+        </p>
       </div>
     </div>
+
   </main>
 </div>
 
 <!-- Modal escribir reseña -->
 <div *ngIf="mostrarModalResena"
-     class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+     class="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
      (click)="cerrarModalResena()">
-  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-8 relative"
+  <div class="bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-lg p-6 sm:p-8 relative max-h-[90vh] overflow-y-auto"
        (click)="$event.stopPropagation()">
 
     <button (click)="cerrarModalResena()"
       class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
 
-    <h2 class="text-2xl font-extrabold text-gray-900 mb-1">Escribir reseña</h2>
-    <p class="text-gray-500 text-sm mb-6">{{ product.nombre }}</p>
+    <h2 class="text-xl md:text-2xl font-extrabold text-gray-900 mb-1">Escribir reseña</h2>
+    <p class="text-gray-500 text-sm mb-5">{{ product.nombre }}</p>
 
-    <!-- Estrellas -->
     <div class="mb-5">
       <label class="block text-sm font-semibold text-gray-700 mb-2">Puntuación</label>
-      <div class="flex gap-1">
+      <div class="flex gap-2">
         <span *ngFor="let n of [1,2,3,4,5]"
               (click)="setPuntuacion(n)"
               (mouseenter)="estrellaHover = n"
@@ -169,32 +201,97 @@
       </div>
     </div>
 
-    <!-- Título -->
     <div class="mb-4">
       <label class="block text-sm font-semibold text-gray-700 mb-1">Título</label>
       <input type="text" [(ngModel)]="nuevaResena.titulo" name="titulo"
         placeholder="Resume tu experiencia..."
-        class="w-full border border-gray-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+        class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
     </div>
 
-    <!-- Comentario -->
-    <div class="mb-6">
+    <div class="mb-5">
       <label class="block text-sm font-semibold text-gray-700 mb-1">Comentario</label>
       <textarea [(ngModel)]="nuevaResena.comentario" name="comentario" rows="4"
         placeholder="Cuéntanos más sobre el producto..."
-        class="w-full border border-gray-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none"></textarea>
+        class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none"></textarea>
     </div>
 
     <p *ngIf="mensajeResena" class="text-red-500 text-sm mb-4">{{ mensajeResena }}</p>
 
     <div class="flex gap-3">
       <button (click)="cerrarModalResena()"
-        class="flex-1 border border-gray-200 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-50 transition">
+        class="flex-1 border border-gray-200 text-gray-700 py-2.5 rounded-xl font-semibold hover:bg-gray-50 transition text-sm">
         Cancelar
       </button>
       <button (click)="enviarResena()" [disabled]="enviandoResena"
-        class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition disabled:opacity-50">
+        class="flex-1 bg-blue-600 text-white py-2.5 rounded-xl font-bold hover:bg-blue-700 transition disabled:opacity-50 text-sm">
         {{ enviandoResena ? 'Enviando...' : 'Publicar reseña' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal reportar reseña -->
+<div *ngIf="mostrarModalReporte"
+     class="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+     (click)="cerrarModalReporte()">
+  <div class="bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-md p-6 sm:p-8 relative"
+       (click)="$event.stopPropagation()">
+
+    <button (click)="cerrarModalReporte()"
+      class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+
+    <div class="flex items-center gap-3 mb-5">
+      <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center shrink-0">
+        <i class="bi bi-slash-circle text-red-500 text-lg"></i>
+      </div>
+      <div>
+        <h2 class="text-lg font-extrabold text-gray-900">Reportar reseña</h2>
+        <p class="text-gray-400 text-xs">De {{ resenaAReportar?.usuario?.nombre }}</p>
+      </div>
+    </div>
+
+    <!-- Motivo -->
+    <div class="mb-4">
+      <label class="block text-sm font-semibold text-gray-700 mb-2">Motivo del reporte</label>
+      <div class="grid grid-cols-2 gap-2">
+        <button *ngFor="let m of [
+          {val:'INAPROPIADA', label:'Inapropiada', icon:'bi-exclamation-triangle'},
+          {val:'FALSA',       label:'Falsa / Spam', icon:'bi-robot'},
+          {val:'SPAM',        label:'Publicidad',   icon:'bi-megaphone'},
+          {val:'OTRO',        label:'Otro motivo',  icon:'bi-three-dots'}
+        ]"
+          (click)="motivoReporte = m.val"
+          class="flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-semibold transition"
+          [class]="motivoReporte === m.val
+            ? 'border-red-400 bg-red-50 text-red-600'
+            : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'">
+          <i [class]="'bi ' + m.icon + ' text-base'"></i>
+          {{ m.label }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Descripción opcional -->
+    <div class="mb-5">
+      <label class="block text-sm font-semibold text-gray-700 mb-1">
+        Descripción <span class="text-gray-400 font-normal">(opcional)</span>
+      </label>
+      <textarea [(ngModel)]="descripcionReporte" rows="3"
+        placeholder="Explica brevemente por qué reportas esta reseña..."
+        class="w-full border border-gray-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-400 text-sm resize-none"></textarea>
+    </div>
+
+    <p *ngIf="mensajeReporte" class="text-red-500 text-sm mb-4">{{ mensajeReporte }}</p>
+
+    <div class="flex gap-3">
+      <button (click)="cerrarModalReporte()"
+        class="flex-1 border border-gray-200 text-gray-700 py-2.5 rounded-xl font-semibold hover:bg-gray-50 transition text-sm">
+        Cancelar
+      </button>
+      <button (click)="enviarReporte()" [disabled]="enviandoReporte"
+        class="flex-1 bg-red-500 text-white py-2.5 rounded-xl font-bold hover:bg-red-600 transition disabled:opacity-50 text-sm flex items-center justify-center gap-2">
+        <i class="bi bi-slash-circle"></i>
+        {{ enviandoReporte ? 'Enviando...' : 'Enviar reporte' }}
       </button>
     </div>
   </div>

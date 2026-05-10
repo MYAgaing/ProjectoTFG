@@ -43,7 +43,7 @@ export class UserProfile implements OnInit {
   resenaABorrar: any = null;
 
   constructor(
-    private auth: AuthServiceTs,
+    public auth: AuthServiceTs,
     private resenaService: ResenaService,
     private favoritoService: FavoritoService,
     private router: Router
