@@ -1,6 +1,5 @@
 package com.reviewmeter.tfg.repository;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,7 +10,7 @@ import com.reviewmeter.tfg.model.Resena;
 
 public interface resenaRepository extends JpaRepository<Resena, Long> {
 
-    List<Resena> findByFechaBetween(LocalDate inicio, LocalDate fin);
+    List<Resena> findByFechaBetween(java.time.LocalDate inicio, java.time.LocalDate fin);
     List<Resena> findByPuntuacionGreaterThanEqual(int min);
     List<Resena> findAllByOrderByPuntuacionDesc();
     List<Resena> findAllByOrderByPuntuacionAsc();
@@ -32,13 +31,12 @@ public interface resenaRepository extends JpaRepository<Resena, Long> {
     @Query("SELECT r.puntuacion, COUNT(r) FROM Resena r WHERE r.producto.idProducto = :id GROUP BY r.puntuacion ORDER BY r.puntuacion ASC")
     List<Object[]> distribucionPuntuacionByProducto(@Param("id") Long id);
 
-    @Query(value = "SELECT MONTH(r.fecha) AS mes, YEAR(r.fecha) AS anio, COUNT(*) AS total, AVG(r.puntuacion) AS media " +
-           "FROM `Reseña` r WHERE r.id_producto = :id " +
+    @Query("SELECT FUNCTION('MONTH', r.fecha), FUNCTION('YEAR', r.fecha), COUNT(r), AVG(r.puntuacion) " +
+           "FROM Resena r WHERE r.producto.idProducto = :id " +
            "AND r.fecha >= :desde " +
-           "GROUP BY YEAR(r.fecha), MONTH(r.fecha) " +
-           "ORDER BY YEAR(r.fecha) ASC, MONTH(r.fecha) ASC",
-           nativeQuery = true)
-    List<Object[]> evolucionMensualByProducto(@Param("id") Long id, @Param("desde") LocalDate desde);
+           "GROUP BY FUNCTION('YEAR', r.fecha), FUNCTION('MONTH', r.fecha) " +
+           "ORDER BY FUNCTION('YEAR', r.fecha) ASC, FUNCTION('MONTH', r.fecha) ASC")
+    List<Object[]> evolucionMensualByProducto(@Param("id") Long id, @Param("desde") java.time.LocalDate desde);
 
     @Query("SELECT r FROM Resena r WHERE r.producto.idProducto = :id ORDER BY r.fecha DESC")
     List<Resena> findTop5ByProductoOrderByFechaDesc(@Param("id") Long id,
