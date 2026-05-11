@@ -20,6 +20,24 @@ export class AuthServiceTs {
     });
   }
 
+  register(nombre: string, email: string, password: string) {
+    return this.http.post(this.api + '/register', {
+      nombre,
+      email,
+      password,
+      rolId: 2   // rol USER por defecto
+    }, {
+      responseType: 'text'
+    });
+  }
+
+  verificarEmail(token: string) {
+    return this.http.get(this.api + '/verificar', {
+      params: { token },
+      responseType: 'text'
+    });
+  }
+
   saveToken(token: string) {
     localStorage.setItem('token', token);
   }

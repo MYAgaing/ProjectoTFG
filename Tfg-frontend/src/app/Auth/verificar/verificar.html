@@ -1,0 +1,57 @@
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 to-purple-600 p-4">
+  <div class="bg-white shadow-xl rounded-2xl p-8 w-full max-w-sm text-center">
+
+    <!-- Logo -->
+    <div class="flex justify-center mb-8">
+      <div class="flex items-center gap-2">
+        <span class="bg-blue-600 text-white text-xl font-bold px-2.5 py-1.5 rounded">R</span>
+        <span class="font-bold text-lg text-gray-800">Reviewmeter</span>
+      </div>
+    </div>
+
+    <!-- Cargando -->
+    <div *ngIf="estado === 'cargando'">
+      <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="animate-spin w-8 h-8 text-blue-500" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+        </svg>
+      </div>
+      <p class="text-gray-500 text-sm">Verificando tu cuenta...</p>
+    </div>
+
+    <!-- Éxito -->
+    <div *ngIf="estado === 'exito'">
+      <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+      <h2 class="text-xl font-bold text-gray-800 mb-2">¡Cuenta verificada!</h2>
+      <p class="text-gray-500 text-sm mb-6">{{ mensaje }}</p>
+      <a routerLink="/login"
+         class="inline-block w-full bg-blue-600 text-white py-2.5 rounded-xl font-semibold
+                hover:bg-blue-700 transition text-sm">
+        Iniciar sesión
+      </a>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="estado === 'error'">
+      <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </div>
+      <h2 class="text-xl font-bold text-gray-800 mb-2">Enlace inválido</h2>
+      <p class="text-gray-500 text-sm mb-6">{{ mensaje }}</p>
+      <a routerLink="/register"
+         class="inline-block w-full bg-blue-600 text-white py-2.5 rounded-xl font-semibold
+                hover:bg-blue-700 transition text-sm">
+        Volver al registro
+      </a>
+    </div>
+
+  </div>
+</div>

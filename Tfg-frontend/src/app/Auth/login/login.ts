@@ -28,8 +28,12 @@ export class Login {
       this.auth.saveToken(token);
       this.router.navigate(['/profile']);
     },
-    error: () => {
-      this.error = 'Credenciales incorrectas';
+    error: (err) => {
+      if (err.status === 403) {
+        this.error = 'Cuenta no verificada. Revisa tu email para activar tu cuenta.';
+      } else {
+        this.error = 'Credenciales incorrectas';
+      }
     }
   });
 }
