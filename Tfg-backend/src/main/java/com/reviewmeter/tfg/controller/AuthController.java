@@ -65,20 +65,13 @@ public class AuthController {
 
         usuarioRepository.save(usuario);
 
-        // Generar token de verificación y enviarlo por email
+        // Generar token de verificación y enviarlo por email (asíncrono)
         String tokenStr = UUID.randomUUID().toString();
         VerificacionToken verificacionToken = new VerificacionToken(tokenStr, usuario);
         tokenRepository.save(verificacionToken);
 
-        try {
-            emailService.enviarEmailVerificacion(usuario.getEmail(), usuario.getNombre(), tokenStr);
-        } catch (Exception e) {
-            // Si el email falla, borramos el usuario para que pueda reintentar
-            tokenRepository.delete(verificacionToken);
-            usuarioRepository.delete(usuario);
-            return ResponseEntity.internalServerError()
-                    .body("No se pudo enviar el email de verificación. Inténtalo de nuevo.");
-        }
+        // El envío es asíncrono — el registro responde inmediatamente
+        emailService.enviarEmailVerificacion(usuario.getEmail(), usuario.getNombre(), tokenStr);
 
         return ResponseEntity.ok("Registro completado. Revisa tu email para activar tu cuenta.");
     }
