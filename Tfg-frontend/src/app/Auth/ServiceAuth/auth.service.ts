@@ -25,7 +25,7 @@ export class AuthServiceTs {
       nombre,
       email,
       password,
-      rolId: 2   // rol USER por defecto
+      rolId: 1   // rol USER por defecto
     }, {
       responseType: 'text'
     });
