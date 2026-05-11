@@ -38,6 +38,12 @@ export class AuthServiceTs {
     });
   }
 
+  reenviarVerificacion(email: string) {
+    return this.http.post(this.api + '/reenviar-verificacion', { email }, {
+      responseType: 'text'
+    });
+  }
+
   saveToken(token: string) {
     localStorage.setItem('token', token);
   }
@@ -77,6 +83,17 @@ export class AuthServiceTs {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       return payload.rol ?? null;
+    } catch {
+      return null;
+    }
+  }
+
+  getMiId(): number | null {
+    const token = this.getToken();
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.idUsuario ?? null;
     } catch {
       return null;
     }

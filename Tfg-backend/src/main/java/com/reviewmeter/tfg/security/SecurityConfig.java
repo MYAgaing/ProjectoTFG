@@ -38,6 +38,12 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.GET, "/api/categorias/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/resenas/mis-resenas").authenticated()
+                    .requestMatchers(HttpMethod.GET, "/api/resenas/destacadas").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/resenas/*/util").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/api/resenas/*/util").authenticated()
+                    .requestMatchers(HttpMethod.GET, "/api/resenas/*/respuestas").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/api/resenas/*/respuestas").authenticated()
+                    .requestMatchers(HttpMethod.DELETE, "/api/resenas/*/respuestas/*").authenticated()
                     .requestMatchers(HttpMethod.GET, "/api/resenas/**").permitAll()
 
                     .requestMatchers(HttpMethod.GET,    "/admin/**").hasRole("ADMIN")

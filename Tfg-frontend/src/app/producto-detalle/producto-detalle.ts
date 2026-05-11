@@ -9,6 +9,8 @@ import { ResenaService } from '../Services/resena-service';
 import { AuthServiceTs } from '../Auth/ServiceAuth/auth.service';
 import { FavoritoService } from '../Services/favorito-service';
 import { ReporteService } from '../Services/reporte-service';
+import { VotoUtilService } from '../Services/voto-util-service';
+import { RespuestaResenaService, Respuesta } from '../Services/respuesta-resena-service';
 
 @Component({
   selector: 'app-producto-detalle',
@@ -50,7 +52,13 @@ export class ProductoDetalle implements OnInit {
   descripcionReporte = '';
   enviandoReporte = false;
   mensajeReporte = '';
-  resenasReportadas = new Set<number>(); // IDs de reseñas ya reportadas por el usuario
+  resenasReportadas = new Set<number>();
+
+  // Votos útil — mapa idResena -> { util, noUtil, miVoto, cargando }
+  votosMap = new Map<number, { util: number; noUtil: number; miVoto: string; cargando: boolean }>();
+
+  // Respuestas — mapa idResena -> { lista, visible, texto, enviando }
+  respuestasMap = new Map<number, { lista: Respuesta[]; visible: boolean; texto: string; enviando: boolean }>();
 
   constructor(
     private route: ActivatedRoute,
@@ -58,6 +66,8 @@ export class ProductoDetalle implements OnInit {
     private sResena: ResenaService,
     private sFavorito: FavoritoService,
     private sReporte: ReporteService,
+    private sVoto: VotoUtilService,
+    private sRespuesta: RespuestaResenaService,
     public auth: AuthServiceTs,
     private router: Router
   ) {}
@@ -81,6 +91,15 @@ export class ProductoDetalle implements OnInit {
       next: (data) => {
         this.listaResenas = data;
         this.listaResenasFiltradas = data;
+        // Cargar votos para cada reseña
+        data.forEach((r: any) => {
+          if (r.idResena) {
+            this.sVoto.getVotos(r.idResena).subscribe({
+              next: (v) => this.votosMap.set(r.idResena, { ...v, cargando: false }),
+              error: () => this.votosMap.set(r.idResena, { util: 0, noUtil: 0, miVoto: '', cargando: false })
+            });
+          }
+        });
       },
       error: () => this.listaResenas = []
     });
@@ -202,5 +221,88 @@ export class ProductoDetalle implements OnInit {
   yaReporto(idResena: number | undefined): boolean {
     if (idResena === undefined) return false;
     return this.resenasReportadas.has(idResena);
+  }
+
+  // --- Votos útil ---
+  getVoto(idResena: number | undefined): { util: number; noUtil: number; miVoto: string; cargando: boolean } {
+    if (!idResena) return { util: 0, noUtil: 0, miVoto: '', cargando: false };
+    return this.votosMap.get(idResena) ?? { util: 0, noUtil: 0, miVoto: '', cargando: false };
+  }
+
+  toggleVoto(resena: any, tipo: 'UTIL' | 'NO_UTIL'): void {
+    if (!this.estaLogueado()) { this.router.navigate(['/login']); return; }
+    const id = resena.idResena;
+    if (!id) return;
+    const actual = this.getVoto(id);
+    if (actual.cargando) return;
+    this.votosMap.set(id, { ...actual, cargando: true });
+    this.sVoto.toggleVoto(id, tipo).subscribe({
+      next: (v) => this.votosMap.set(id, { ...v, cargando: false }),
+      error: () => this.votosMap.set(id, { ...actual, cargando: false })
+    });
+  }
+
+  // --- Respuestas ---
+  getRespuestas(idResena: number | undefined) {
+    if (!idResena) return { lista: [], visible: false, texto: '', enviando: false };
+    return this.respuestasMap.get(idResena) ?? { lista: [], visible: false, texto: '', enviando: false };
+  }
+
+  toggleRespuestas(resena: any): void {
+    const id = resena.idResena;
+    if (!id) return;
+    const actual = this.getRespuestas(id);
+    if (!actual.visible && actual.lista.length === 0) {
+      // Inicializar entrada en el mapa antes de cargar
+      this.respuestasMap.set(id, { lista: [], visible: false, texto: '', enviando: false });
+      this.sRespuesta.getRespuestas(id).subscribe({
+        next: (lista) => this.respuestasMap.set(id, { lista, visible: true, texto: '', enviando: false }),
+        error: () => this.respuestasMap.set(id, { lista: [], visible: true, texto: '', enviando: false })
+      });
+    } else {
+      this.respuestasMap.set(id, { ...actual, visible: !actual.visible });
+    }
+  }
+
+  setTextoRespuesta(idResena: number | undefined, texto: string): void {
+    if (!idResena) return;
+    const actual = this.getRespuestas(idResena);
+    this.respuestasMap.set(idResena, { ...actual, texto });
+  }
+
+  enviarRespuesta(resena: any): void {
+    if (!this.estaLogueado()) { this.router.navigate(['/login']); return; }
+    const id = resena.idResena;
+    if (!id) return;
+    const actual = this.getRespuestas(id);
+    if (!actual.texto.trim() || actual.enviando) return;
+    this.respuestasMap.set(id, { ...actual, enviando: true });
+    this.sRespuesta.crearRespuesta(id, actual.texto).subscribe({
+      next: (r) => this.respuestasMap.set(id, {
+        lista: [...actual.lista, r],
+        visible: true,
+        texto: '',
+        enviando: false
+      }),
+      error: () => this.respuestasMap.set(id, { ...actual, enviando: false })
+    });
+  }
+
+  borrarRespuesta(resena: any, respuesta: Respuesta): void {
+    const id = resena.idResena;
+    if (!id) return;
+    this.sRespuesta.borrarRespuesta(id, respuesta.id).subscribe({
+      next: () => {
+        const actual = this.getRespuestas(id);
+        this.respuestasMap.set(id, {
+          ...actual,
+          lista: actual.lista.filter(r => r.id !== respuesta.id)
+        });
+      }
+    });
+  }
+
+  getMiId(): number | null {
+    return this.auth.getMiId();
   }
 }

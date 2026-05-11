@@ -1,13 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthServiceTs } from '../ServiceAuth/auth.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, RouterLink],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
@@ -29,11 +29,7 @@ export class Login {
       this.router.navigate(['/profile']);
     },
     error: (err) => {
-      if (err.status === 403) {
-        this.error = 'Cuenta no verificada. Revisa tu email para activar tu cuenta.';
-      } else {
-        this.error = 'Credenciales incorrectas';
-      }
+      this.error = 'Credenciales incorrectas';
     }
   });
 }

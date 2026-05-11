@@ -31,6 +31,15 @@
         <h1 class="text-3xl font-extrabold">{{ user?.nombre }}</h1>
         <p class="text-blue-200 text-sm mt-1">{{ user?.email }}</p>
         <p class="text-blue-200 text-sm">Miembro desde {{ user?.fechaRegistro | date:'MMMM yyyy' }}</p>
+        <!-- Badge verificación -->
+        <div class="mt-2">
+          <span *ngIf="user?.estado" class="inline-flex items-center gap-1 bg-green-400 text-white text-xs font-bold px-3 py-1 rounded-full">
+            <i class="bi bi-patch-check-fill"></i> Cuenta verificada
+          </span>
+          <span *ngIf="user && !user.estado" class="inline-flex items-center gap-1 bg-yellow-400 text-white text-xs font-bold px-3 py-1 rounded-full">
+            <i class="bi bi-exclamation-circle-fill"></i> Email no verificado
+          </span>
+        </div>
       </div>
     </div>
   </div>
@@ -85,45 +94,60 @@
         </a>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-12">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-12">
         <div *ngFor="let r of misResenas"
-             class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition">
+             class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
 
-          <!-- Producto -->
-          <div class="flex items-center gap-3 mb-4">
+          <!-- Imagen del producto -->
+          <a [routerLink]="['/producto', r.producto?.idProducto]"
+             class="block relative bg-gray-50 h-52 flex items-center justify-center overflow-hidden group">
             <img [src]="r.producto?.imageUrl" [alt]="r.producto?.nombre"
-                 class="w-12 h-12 object-contain rounded-lg bg-gray-50 border border-gray-100 p-1">
-            <div>
-              <a [routerLink]="['/producto', r.producto?.idProducto]"
-                 class="font-bold text-gray-900 hover:text-blue-600 transition text-sm">
-                {{ r.producto?.nombre }}
-              </a>
-              <p class="text-xs text-gray-400">{{ r.producto?.marca }}</p>
+                 class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105">
+            <!-- Badge marca -->
+            <span class="absolute top-3 left-3 bg-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded-full uppercase">
+              {{ r.producto?.marca }}
+            </span>
+            <!-- Badge verificado -->
+            <span *ngIf="user?.estado"
+                  class="absolute top-3 right-3 inline-flex items-center gap-0.5 bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
+              <i class="bi bi-patch-check-fill text-xs"></i> Verificado
+            </span>
+          </a>
+
+          <!-- Contenido -->
+          <div class="p-5 flex flex-col flex-1">
+
+            <!-- Nombre producto -->
+            <a [routerLink]="['/producto', r.producto?.idProducto]"
+               class="font-bold text-gray-900 hover:text-blue-600 transition text-sm leading-snug mb-3 line-clamp-2">
+              {{ r.producto?.nombre }}
+            </a>
+
+            <!-- Estrellas + fecha -->
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex text-yellow-400 text-base">
+                <span *ngFor="let s of getStars(r.puntuacion)">{{ s }}</span>
+              </div>
+              <span class="text-xs text-gray-400">{{ r.fecha }}</span>
+            </div>
+
+            <!-- Título y comentario -->
+            <h4 class="font-bold text-gray-800 text-sm mb-1">{{ r.titulo }}</h4>
+            <p class="text-gray-500 text-sm leading-relaxed line-clamp-3 flex-1">{{ r.comentario }}</p>
+
+            <!-- Acciones -->
+            <div class="flex gap-2 mt-4 pt-4 border-t border-gray-100">
+              <button (click)="abrirEditar(r)"
+                class="flex-1 flex items-center justify-center gap-1.5 border border-blue-200 text-blue-600 py-2 rounded-xl text-sm font-semibold hover:bg-blue-50 transition">
+                <i class="bi bi-pencil"></i> Editar
+              </button>
+              <button (click)="confirmarBorrar(r)"
+                class="flex-1 flex items-center justify-center gap-1.5 border border-red-200 text-red-500 py-2 rounded-xl text-sm font-semibold hover:bg-red-50 transition">
+                <i class="bi bi-trash"></i> Eliminar
+              </button>
             </div>
           </div>
 
-          <!-- Estrellas y fecha -->
-          <div class="flex items-center justify-between mb-3">
-            <div class="flex text-yellow-400 text-lg">
-              <span *ngFor="let s of getStars(r.puntuacion)">{{ s }}</span>
-            </div>
-            <span class="text-xs text-gray-400">{{ r.fecha }}</span>
-          </div>
-
-          <h4 class="font-bold text-gray-800 mb-1">{{ r.titulo }}</h4>
-          <p class="text-gray-500 text-sm leading-relaxed line-clamp-3">{{ r.comentario }}</p>
-
-          <!-- Acciones -->
-          <div class="flex gap-2 mt-4 pt-4 border-t border-gray-100">
-            <button (click)="abrirEditar(r)"
-              class="flex-1 flex items-center justify-center gap-1 border border-blue-200 text-blue-600 py-2 rounded-xl text-sm font-semibold hover:bg-blue-50 transition">
-              <i class="bi bi-pencil"></i> Editar
-            </button>
-            <button (click)="confirmarBorrar(r)"
-              class="flex-1 flex items-center justify-center gap-1 border border-red-200 text-red-500 py-2 rounded-xl text-sm font-semibold hover:bg-red-50 transition">
-              <i class="bi bi-trash"></i> Eliminar
-            </button>
-          </div>
         </div>
       </div>
     </div>
@@ -146,7 +170,7 @@
 
           <div class="relative h-44 bg-gray-50 flex items-center justify-center overflow-hidden">
             <img [src]="f.producto?.imageUrl" [alt]="f.producto?.nombre"
-                 class="h-full w-full object-contain p-4 transition-transform duration-300 group-hover:scale-105">
+                 class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105">
             <span class="absolute top-3 left-3 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full uppercase">
               {{ f.producto?.marca }}
             </span>
@@ -171,6 +195,31 @@
 
     <!-- Tab: Ajustes -->
     <div *ngIf="tabActivo === 'ajustes'" class="max-w-lg pb-12 mx-auto">
+
+      <!-- Banner cuenta no verificada -->
+      <div *ngIf="user && !user.estado"
+           class="bg-yellow-50 border border-yellow-200 rounded-2xl p-5 mb-6 flex flex-col sm:flex-row sm:items-center gap-4">
+        <div class="flex items-center gap-3 flex-1">
+          <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center shrink-0">
+            <i class="bi bi-envelope-exclamation text-yellow-600 text-lg"></i>
+          </div>
+          <div>
+            <p class="font-bold text-yellow-800 text-sm">Email no verificado</p>
+            <p class="text-yellow-600 text-xs mt-0.5">Verifica tu cuenta para acceder a todas las funciones.</p>
+            <p *ngIf="mensajeVerificacion" class="text-green-600 text-xs mt-1 font-semibold">{{ mensajeVerificacion }}</p>
+          </div>
+        </div>
+        <button (click)="reenviarVerificacion()" [disabled]="enviandoVerificacion"
+          class="bg-yellow-500 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-yellow-600 transition disabled:opacity-50 shrink-0 flex items-center gap-2">
+          <svg *ngIf="enviandoVerificacion" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+          </svg>
+          <i *ngIf="!enviandoVerificacion" class="bi bi-send"></i>
+          {{ enviandoVerificacion ? 'Enviando...' : 'Reenviar email' }}
+        </button>
+      </div>
+
       <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
         <h2 class="text-xl font-extrabold text-gray-900 mb-6">Ajustes de cuenta</h2>
 

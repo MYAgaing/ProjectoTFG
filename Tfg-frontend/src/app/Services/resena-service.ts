@@ -78,6 +78,11 @@ export class ResenaService {
     return this.http.get<any[]>(`${this.baseUrl}/producto/${idProducto}`, { params });
   }
 
+  // GET: Reseñas destacadas para el home (top 6)
+  getResenasDestacadas(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/destacadas`);
+  }
+
   // GET: Mis reseñas (requiere token)
   getMisResenas(): Observable<any[]> {
     const token = localStorage.getItem('token');

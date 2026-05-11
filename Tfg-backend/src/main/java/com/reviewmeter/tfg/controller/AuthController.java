@@ -1,6 +1,7 @@
 package com.reviewmeter.tfg.controller;
 
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,6 +77,35 @@ public class AuthController {
         return ResponseEntity.ok("Registro completado. Revisa tu email para activar tu cuenta.");
     }
 
+    // ── Reenviar email de verificación ───────────────────────────────────────
+
+    @PostMapping("/reenviar-verificacion")
+    public ResponseEntity<String> reenviarVerificacion(@RequestBody Map<String, String> body) {
+
+        String email = body.get("email");
+        if (email == null || email.isBlank()) {
+            return ResponseEntity.badRequest().body("Email requerido.");
+        }
+
+        Usuario usuario = usuarioRepository.findByEmail(email).orElse(null);
+        if (usuario == null) {
+            // No revelamos si el email existe o no por seguridad
+            return ResponseEntity.ok("Si el email existe, recibirás un nuevo enlace.");
+        }
+        if (Boolean.TRUE.equals(usuario.getEstado())) {
+            return ResponseEntity.badRequest().body("La cuenta ya está verificada.");
+        }
+
+        // Borrar token anterior si existe y crear uno nuevo
+        tokenRepository.deleteByUsuario_IdUsuario(usuario.getIdUsuario());
+        String tokenStr = UUID.randomUUID().toString();
+        VerificacionToken verificacionToken = new VerificacionToken(tokenStr, usuario);
+        tokenRepository.save(verificacionToken);
+
+        emailService.enviarEmailVerificacion(usuario.getEmail(), usuario.getNombre(), tokenStr);
+
+        return ResponseEntity.ok("Email de verificación reenviado. Revisa tu bandeja de entrada.");
+    }
     // ── Verificación de email ─────────────────────────────────────────────────
 
     @GetMapping("/verificar")
@@ -115,10 +145,6 @@ public class AuthController {
 
         if (dbUser == null || !passwordEncoder.matches(request.getPassword(), dbUser.getPassword())) {
             return ResponseEntity.status(401).body("Credenciales incorrectas");
-        }
-
-        if (!Boolean.TRUE.equals(dbUser.getEstado())) {
-            return ResponseEntity.status(403).body("Cuenta no verificada. Revisa tu email.");
         }
 
         return ResponseEntity.ok(jwtService.generateToken(dbUser));

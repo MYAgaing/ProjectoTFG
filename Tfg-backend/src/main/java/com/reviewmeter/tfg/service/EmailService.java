@@ -30,8 +30,8 @@ public class EmailService {
      * @param token        UUID de verificación
      */
     @Async
-    public void enviarEmailVerificacion(String destinatario, String nombre, String token)
-            throws MessagingException {
+    public void enviarEmailVerificacion(String destinatario, String nombre, String token) {
+        try {
 
         String enlace = frontendUrl + "/verificar?token=" + token;
 
@@ -119,5 +119,11 @@ public class EmailService {
         helper.setText(html, true);
 
         mailSender.send(mensaje);
+
+        } catch (Exception e) {
+            // El fallo de email se registra pero no interrumpe el flujo
+            System.err.println("[EmailService] Error al enviar email de verificación a "
+                    + destinatario + ": " + e.getMessage());
+        }
     }
 }

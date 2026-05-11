@@ -110,6 +110,26 @@ export class UserProfile implements OnInit {
     });
   }
 
+  // Verificación de cuenta
+  enviandoVerificacion = false;
+  mensajeVerificacion = '';
+
+  reenviarVerificacion() {
+    if (!this.user?.email) return;
+    this.enviandoVerificacion = true;
+    this.mensajeVerificacion = '';
+    this.auth.reenviarVerificacion(this.user.email).subscribe({
+      next: () => {
+        this.enviandoVerificacion = false;
+        this.mensajeVerificacion = 'Email enviado. Revisa tu bandeja de entrada.';
+      },
+      error: () => {
+        this.enviandoVerificacion = false;
+        this.mensajeVerificacion = 'Error al enviar el email. Inténtalo de nuevo.';
+      }
+    });
+  }
+
   logout() {
     this.auth.logout();
     this.router.navigate(['/']);

@@ -61,9 +61,10 @@
       <div class="flex flex-col md:flex-row">
 
         <!-- Imagen -->
-        <div class="md:w-1/2 bg-gray-50 p-6 md:p-8 flex items-center justify-center border-b md:border-b-0 md:border-r border-gray-100 min-h-[220px]">
+        <div class="md:w-1/2 overflow-hidden border-b md:border-b-0 md:border-r border-gray-100 min-h-[300px] md:min-h-[420px]">
           <img [src]="product.imageUrl" [alt]="product.nombre"
-               class="max-h-64 md:max-h-80 w-auto object-contain hover:scale-105 transition-transform duration-300">
+               class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+               style="min-height: 300px;">
         </div>
 
         <!-- Info -->
@@ -137,7 +138,13 @@
                 {{ resena.usuario?.nombre?.charAt(0) || 'U' }}
               </div>
               <div class="min-w-0">
-                <h4 class="font-bold text-gray-900 text-sm truncate">{{ resena.usuario?.nombre }}</h4>
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <h4 class="font-bold text-gray-900 text-sm truncate">{{ resena.usuario?.nombre }}</h4>
+                  <span *ngIf="resena.usuario?.estado"
+                        class="inline-flex items-center gap-0.5 bg-green-100 text-green-700 text-xs font-semibold px-1.5 py-0.5 rounded-full">
+                    <i class="bi bi-patch-check-fill text-xs"></i> Verificado
+                  </span>
+                </div>
                 <p class="text-xs text-gray-400">{{ resena.fecha }}</p>
               </div>
             </div>
@@ -150,22 +157,113 @@
           <p class="text-gray-600 text-sm leading-relaxed mb-4">{{ resena.comentario }}</p>
 
           <div class="pt-3 border-t border-gray-50 flex items-center justify-between">
-            <button class="text-gray-400 text-xs flex items-center gap-1 hover:text-blue-600 transition">
-              <i class="bi bi-hand-thumbs-up"></i> ¿Es útil?
-            </button>
-            <!-- Botón reportar (solo si está logueado) -->
-            <button *ngIf="estaLogueado()"
-              (click)="abrirModalReporte(resena)"
-              [disabled]="yaReporto(resena.idResena)"
-              class="text-xs flex items-center gap-1 px-2.5 py-1 rounded-lg transition"
-              [class]="yaReporto(resena.idResena)
-                ? 'text-red-400 bg-red-50 cursor-not-allowed'
-                : 'text-gray-500 hover:text-red-500 hover:bg-red-50'"
-              [title]="yaReporto(resena.idResena) ? 'Ya has reportado esta reseña' : 'Reportar reseña'">
-              <i class="bi bi-slash-circle"></i>
-              {{ yaReporto(resena.idResena) ? 'Reportada' : 'Reportar' }}
-            </button>
+            <!-- Botones de voto -->
+            <div class="flex items-center gap-2">
+              <!-- 👍 Útil -->
+              <button
+                (click)="toggleVoto(resena, 'UTIL')"
+                [disabled]="getVoto(resena.idResena).cargando"
+                class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-bold transition-all duration-200"
+                [class]="getVoto(resena.idResena).miVoto === 'UTIL'
+                  ? 'bg-green-500 text-white shadow-md scale-105'
+                  : 'bg-green-50 text-green-600 hover:bg-green-100 hover:scale-105'">
+                <i class="bi bi-hand-thumbs-up-fill text-base"></i>
+                <span *ngIf="getVoto(resena.idResena).util > 0" class="font-extrabold">
+                  {{ getVoto(resena.idResena).util }}
+                </span>
+              </button>
+
+              <!-- 👎 No útil -->
+              <button
+                (click)="toggleVoto(resena, 'NO_UTIL')"
+                [disabled]="getVoto(resena.idResena).cargando"
+                class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-bold transition-all duration-200"
+                [class]="getVoto(resena.idResena).miVoto === 'NO_UTIL'
+                  ? 'bg-red-500 text-white shadow-md scale-105'
+                  : 'bg-red-50 text-red-500 hover:bg-red-100 hover:scale-105'">
+                <i class="bi bi-hand-thumbs-down-fill text-base"></i>
+                <span *ngIf="getVoto(resena.idResena).noUtil > 0" class="font-extrabold">
+                  {{ getVoto(resena.idResena).noUtil }}
+                </span>
+              </button>
+            </div>
+
+            <!-- Botones derecha: Responder + Reportar -->
+            <div class="flex items-center gap-3">
+              <!-- Responder -->
+              <button (click)="toggleRespuestas(resena)"
+                class="flex items-center gap-1.5 text-xs text-gray-400 hover:text-blue-600 transition font-medium">
+                <i class="bi bi-chat-dots"></i>
+                <span>{{ getRespuestas(resena.idResena).lista.length > 0 ? getRespuestas(resena.idResena).lista.length + ' respuestas' : 'Responder' }}</span>
+                <i class="bi" [class]="getRespuestas(resena.idResena).visible ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+              </button>
+
+              <!-- Reportar -->
+              <button *ngIf="estaLogueado()"
+                (click)="abrirModalReporte(resena)"
+                [disabled]="yaReporto(resena.idResena)"
+                class="flex items-center gap-1 text-xs px-2 py-1 rounded-lg transition"
+                [class]="yaReporto(resena.idResena)
+                  ? 'text-red-400 bg-red-50 cursor-not-allowed'
+                  : 'text-gray-400 hover:text-red-500 hover:bg-red-50'"
+                [title]="yaReporto(resena.idResena) ? 'Ya has reportado esta reseña' : 'Reportar reseña'">
+                <i class="bi bi-slash-circle"></i>
+                {{ yaReporto(resena.idResena) ? 'Reportada' : 'Reportar' }}
+              </button>
+            </div>
           </div>
+
+          <!-- Sección de respuestas -->
+          <div *ngIf="getRespuestas(resena.idResena).visible" class="mt-3 border-t border-gray-50 pt-3">
+
+            <!-- Lista de respuestas -->
+            <div *ngFor="let r of getRespuestas(resena.idResena).lista"
+                 class="flex gap-2.5 mb-3">
+              <div class="w-7 h-7 rounded-full bg-purple-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                {{ r.usuario?.nombre?.charAt(0)?.toUpperCase() || 'U' }}
+              </div>
+              <div class="flex-1 bg-gray-50 rounded-xl px-3 py-2">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="font-semibold text-gray-800 text-xs">{{ r.usuario?.nombre }}</span>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs text-gray-400">{{ r.fecha | date:'dd/MM/yyyy' }}</span>
+                    <button *ngIf="r.usuario?.idUsuario === getMiId()"
+                      (click)="borrarRespuesta(resena, r)"
+                      class="text-gray-300 hover:text-red-400 transition text-xs">
+                      <i class="bi bi-x-lg"></i>
+                    </button>
+                  </div>
+                </div>
+                <p class="text-gray-600 text-xs leading-relaxed">{{ r.texto }}</p>
+              </div>
+            </div>
+
+            <!-- Sin respuestas -->
+            <p *ngIf="getRespuestas(resena.idResena).lista.length === 0"
+               class="text-xs text-gray-400 mb-3 text-center">
+              Sé el primero en responder
+            </p>
+
+            <!-- Formulario nueva respuesta -->
+            <div *ngIf="estaLogueado()" class="flex gap-2 mt-2">
+              <input type="text"
+                [value]="getRespuestas(resena.idResena).texto"
+                (input)="setTextoRespuesta(resena.idResena, $any($event.target).value)"
+                placeholder="Escribe una respuesta..."
+                maxlength="1000"
+                class="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-400"
+                (keyup.enter)="enviarRespuesta(resena)">
+              <button (click)="enviarRespuesta(resena)"
+                [disabled]="!getRespuestas(resena.idResena).texto.trim() || getRespuestas(resena.idResena).enviando"
+                class="bg-blue-600 text-white px-3 py-2 rounded-xl text-xs font-bold hover:bg-blue-700 transition disabled:opacity-50">
+                <i class="bi bi-send-fill"></i>
+              </button>
+            </div>
+            <p *ngIf="!estaLogueado()" class="text-xs text-gray-400 text-center mt-2">
+              <a routerLink="/login" class="text-blue-500 hover:underline">Inicia sesión</a> para responder
+            </p>
+          </div>
+
         </div>
       </div>
 

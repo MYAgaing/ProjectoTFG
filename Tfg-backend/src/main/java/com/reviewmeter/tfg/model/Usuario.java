@@ -51,7 +51,7 @@ public class Usuario implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return estado;
+        return true; // La verificación de email no bloquea la cuenta
     }
 
     @Override
@@ -61,7 +61,7 @@ public class Usuario implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return estado;
+        return true; // La verificación de email es informativa, no bloquea el acceso
     }
 
 

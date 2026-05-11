@@ -109,6 +109,17 @@ public class resenasController {
 		return ResponseEntity.ok(resenaService.filtrarPorPuntuacion(min));
 	}
 
+	// Top reseñas para el home (máximo 6, mejor valoradas con producto e imagen)
+	@GetMapping("/destacadas")
+	public ResponseEntity<List<Resena>> destacadas() {
+		List<Resena> top = resenaService.ordenarPorPuntuacionDesc()
+				.stream()
+				.filter(r -> r.getProducto() != null && r.getProducto().getImageUrl() != null)
+				.limit(6)
+				.collect(java.util.stream.Collectors.toList());
+		return ResponseEntity.ok(top);
+	}
+
 	// Ordenar por mejor valoradas
 	@GetMapping("/top")
 	public ResponseEntity<List<Resena>> mejoresValoradas() {

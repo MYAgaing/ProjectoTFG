@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Producto } from '../Model/productoModel.model';
 import { Servicios } from '../Services/servicios';
 import { ProductoService } from '../Services/producto-service';
+import { ResenaService } from '../Services/resena-service';
 import { AuthServiceTs } from '../Auth/ServiceAuth/auth.service';
 
 @Component({
@@ -21,13 +22,22 @@ export class Home implements OnInit {
   listaElectronica: Producto[] = []
   listaModa: Producto[] = []
 
+  resenasDestacadas: any[] = []
+  resenaActivaIdx = 0
+
   // Búsqueda
   todosLosProductos: Producto[] = []
   terminoBusqueda: string = ''
   resultadosBusqueda: Producto[] = []
   mostrarDropdown: boolean = false
 
-  constructor(private s: Servicios, private productoService: ProductoService, private router: Router, public auth: AuthServiceTs) { }
+  constructor(
+    private s: Servicios,
+    private productoService: ProductoService,
+    private resenaService: ResenaService,
+    private router: Router,
+    public auth: AuthServiceTs
+  ) { }
 
   ngOnInit(): void {
     this.s.getProductosPorCategoria(1).subscribe((data) => { this.listaTecnologia = data; });
@@ -36,10 +46,18 @@ export class Home implements OnInit {
     this.s.getProductosPorCategoria(4).subscribe((data) => { this.listaElectronica = data; });
     this.s.getProductosPorCategoria(5).subscribe((data) => { this.listaModa = data; });
 
-    // Cargar todos los productos para la búsqueda
+    this.resenaService.getResenasDestacadas().subscribe({
+      next: (data) => { this.resenasDestacadas = data; },
+      error: () => { this.resenasDestacadas = []; }
+    });
+
     this.productoService.getProductos().subscribe((data) => {
       this.todosLosProductos = data;
     });
+  }
+
+  getStars(n: number): string[] {
+    return Array(5).fill(0).map((_, i) => i < n ? '★' : '☆');
   }
 
   buscar(): void {
