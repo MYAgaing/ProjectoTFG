@@ -24,12 +24,32 @@ export class AuthServiceTs {
     localStorage.setItem('token', token);
   }
 
-  getToken() {
-    return localStorage.getItem('token');
+  getToken(): string | null {
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+    // Si el token ha expirado, lo eliminamos automáticamente
+    if (this.isTokenExpired(token)) {
+      localStorage.removeItem('token');
+      return null;
+    }
+    return token;
   }
 
   logout() {
     localStorage.removeItem('token');
+  }
+
+  /** Comprueba si el JWT ha expirado */
+  private isTokenExpired(token: string): boolean {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (!payload.exp) return false;
+      // exp está en segundos, Date.now() en milisegundos
+      return payload.exp * 1000 < Date.now();
+    } catch {
+      // Token malformado → lo tratamos como expirado
+      return true;
+    }
   }
 
   /** Extrae el rol del payload del JWT sin librería externa */

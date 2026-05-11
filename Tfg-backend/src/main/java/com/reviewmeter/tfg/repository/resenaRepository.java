@@ -32,11 +32,12 @@ public interface resenaRepository extends JpaRepository<Resena, Long> {
     @Query("SELECT r.puntuacion, COUNT(r) FROM Resena r WHERE r.producto.idProducto = :id GROUP BY r.puntuacion ORDER BY r.puntuacion ASC")
     List<Object[]> distribucionPuntuacionByProducto(@Param("id") Long id);
 
-    @Query("SELECT MONTH(r.fecha), YEAR(r.fecha), COUNT(r), AVG(r.puntuacion) " +
-           "FROM Resena r WHERE r.producto.idProducto = :id " +
+    @Query(value = "SELECT MONTH(r.fecha) AS mes, YEAR(r.fecha) AS anio, COUNT(*) AS total, AVG(r.puntuacion) AS media " +
+           "FROM `Reseña` r WHERE r.id_producto = :id " +
            "AND r.fecha >= :desde " +
            "GROUP BY YEAR(r.fecha), MONTH(r.fecha) " +
-           "ORDER BY YEAR(r.fecha) ASC, MONTH(r.fecha) ASC")
+           "ORDER BY YEAR(r.fecha) ASC, MONTH(r.fecha) ASC",
+           nativeQuery = true)
     List<Object[]> evolucionMensualByProducto(@Param("id") Long id, @Param("desde") LocalDate desde);
 
     @Query("SELECT r FROM Resena r WHERE r.producto.idProducto = :id ORDER BY r.fecha DESC")
