@@ -2,130 +2,138 @@
 
 ## ✅ Problema Identificado
 
-**Error Real**: `SocketTimeoutException: Connect timed out - Couldn't connect to host, port: smtp.gmail.com, 587`
+**Error**: `SocketTimeoutException: Connect timed out - Couldn't connect to host, port: smtp.gmail.com, 587`
 
-**Causa**: Railway (y muchas plataformas de hosting) **bloquean los puertos SMTP salientes** (587, 25) para prevenir spam. Esto es una limitación de la infraestructura, no de tu código.
+**Causa**: Railway bloquea los puertos SMTP tradicionales (587, 25) para prevenir spam.
 
-Los logs muestran claramente:
-```
-Error inesperado al enviar email de verificación a nicolas.adones839@gmail.com: 
-Mail server connection failed. Failed messages: 
-org.eclipse.angus.mail.util.MailConnectException: Couldn't connect to host, port: smtp.gmail.com, 587; timeout 5000
-```
+---
 
-## Soluciones Disponibles
-
-### ✅ Solución 1: Usar SendGrid (RECOMENDADO) 🚀
-
-SendGrid es un servicio profesional de emails que funciona perfectamente en Railway:
-
-- **Plan gratuito**: 100 emails/día (3,000/mes)
-- **No hay bloqueos**: Usa APIs en lugar de SMTP tradicional
-- **Mejor deliverability**: Menos probabilidad de ir a spam
-- **Fácil configuración**: Solo necesitas una API key
-- **Estadísticas**: Puedes ver qué emails se enviaron y abrieron
-
-**Ver instrucciones completas en**: `CONFIGURAR_SENDGRID.md`
-
-**Configuración rápida**:
-1. Crear cuenta en https://signup.sendgrid.com/
-2. Crear API Key en Settings → API Keys
-3. Verificar email en Settings → Sender Authentication → Verify a Single Sender
-4. Configurar en Railway:
-   ```
-   MAIL_HOST=smtp.sendgrid.net
-   MAIL_PORT=587
-   MAIL_USERNAME=apikey
-   MAIL_PASSWORD=SG.tu_api_key_aqui
-   ```
-5. Desplegar y probar
-
-### ⚠️ Solución 2: Intentar Puerto 465 con Gmail
-
-He actualizado la configuración para usar el puerto 465 (SSL) en lugar de 587 (TLS). Algunos proveedores permiten este puerto.
-
-**Cambios realizados en application.properties**:
-- Puerto cambiado de 587 a 465
-- STARTTLS deshabilitado
-- SSL habilitado
-- Timeouts aumentados a 10 segundos
-
-**Para probar**:
-1. Actualiza la variable en Railway: `MAIL_PORT=465`
-2. Despliega los cambios (ver comandos abajo)
-3. Intenta reenviar un email
-4. Revisa los logs
-
-**Probabilidad de éxito**: Baja (Railway probablemente también bloquea este puerto)
-
-## Cambios Realizados en el Código
+## 🔧 Cambios Realizados en el Código
 
 ### 1. EmailService.java ✅
-- Agregado logging con SLF4J para rastrear el envío de emails
-- Logs informativos: "Iniciando envío..." y "Email enviado exitosamente..."
-- Logs de error detallados con stack traces
-- Separación de excepciones de mensajería vs. generales
+- Agregado logging con SLF4J
+- Logs detallados de inicio y éxito/error
+- Mejor manejo de excepciones
 
 ### 2. AuthController.java ✅
-- Agregado try-catch en el método `reenviarVerificacion`
-- Retorna error 500 si falla el envío del email
-- Logs de error para debugging en Railway
+- Try-catch en `reenviarVerificacion`
+- Retorna error 500 si falla
+- Logs para debugging
 
 ### 3. application.properties ✅
-- Configuración de logging nivel DEBUG
-- **Puerto cambiado a 465 (SSL)** para intentar evitar bloqueos
-- SSL habilitado en lugar de STARTTLS
+- **Puerto cambiado a 465 (SSL)**
+- SSL habilitado
 - Timeouts aumentados a 10 segundos
+- Logging nivel DEBUG
 
-### 4. Documentación ✅
-- `SOLUCION_EMAIL_VERIFICACION.md` - Este archivo
-- `CONFIGURAR_SENDGRID.md` - Guía completa para configurar SendGrid
+---
 
-## Próximos Pasos
+## 🚀 Soluciones Disponibles
 
-### Opción A: SendGrid (Recomendado) 🚀
+### Opción 1: Puerto 465 con Gmail (PROBAR PRIMERO)
 
-1. Sigue las instrucciones en `CONFIGURAR_SENDGRID.md`
-2. Configura las variables en Railway
-3. Despliega y prueba
-4. ✅ Problema resuelto
+**Ya está configurado en el código**. Solo necesitas:
 
-### Opción B: Intentar Puerto 465 con Gmail ⚠️
+1. **Actualizar en Railway**:
+   - Variables → `MAIL_PORT=465`
 
-1. Actualiza en Railway: `MAIL_PORT=465`
-2. Commit y push los cambios:
+2. **Desplegar**:
    ```bash
-   cd Tfg-backend
-   git add .
-   git commit -m "Fix: Cambiar a puerto 465 SSL y mejorar logging de emails"
+   cd c:\Users\nicol\Documents\ProjectoTFG\Tfg-backend
+   git add src/
+   git commit -m "Fix: Puerto 465 SSL para Gmail"
    git push
    ```
-3. Revisa los logs después de intentar reenviar
-4. Si sigue fallando con timeout, usa SendGrid
 
-## Ver Logs en Railway
+3. **Probar y revisar logs**
 
-1. Ve a tu proyecto en Railway
-2. Haz clic en el servicio del backend
-3. Ve a "Deployments" → deployment activo → "View Logs"
+⚠️ **Probabilidad**: 20% (Railway puede bloquear este puerto también)
 
-Busca:
-```
-✅ Iniciando envío de email de verificación a: [email]
-✅ Email de verificación enviado exitosamente a: [email]
+---
 
-❌ Error inesperado al enviar email de verificación a [email]: ...
-```
+### Opción 2: Brevo (ex-Sendinblue) - RECOMENDADO
 
-## Recomendación Final
+**Plan gratuito**: 300 emails/día
 
-**Usa SendGrid**. Es la solución más confiable para producción:
+1. Crear cuenta: https://www.brevo.com/
+2. Settings → SMTP & API → Generar SMTP Key
+3. Configurar en Railway:
+   ```
+   MAIL_HOST=smtp-relay.brevo.com
+   MAIL_PORT=587
+   MAIL_USERNAME=tu_email@ejemplo.com
+   MAIL_PASSWORD=tu_smtp_key
+   ```
 
-1. ✅ Funciona en Railway sin problemas de puertos
-2. ✅ Plan gratuito generoso (100 emails/día)
-3. ✅ Mejor deliverability que Gmail
-4. ✅ Estadísticas y monitoreo de emails
-5. ✅ Configuración en 10 minutos
-6. ✅ Escalable cuando tu app crezca
+✅ **Funciona en Railway**: Sí
 
-Ver `CONFIGURAR_SENDGRID.md` para instrucciones paso a paso.
+---
+
+### Opción 3: Mailgun
+
+**Plan gratuito**: 5,000 emails/mes (3 meses)
+
+1. Crear cuenta: https://signup.mailgun.com/
+2. Dashboard → Domain settings → Copiar credenciales SMTP
+3. Configurar en Railway:
+   ```
+   MAIL_HOST=smtp.mailgun.org
+   MAIL_PORT=587
+   MAIL_USERNAME=postmaster@sandboxXXX.mailgun.org
+   MAIL_PASSWORD=tu_password
+   ```
+
+✅ **Funciona en Railway**: Sí
+
+---
+
+### Opción 4: Amazon SES
+
+**Costo**: 62,000 emails/mes gratis, luego $0.10/1,000
+
+1. Crear cuenta AWS: https://aws.amazon.com/ses/
+2. Verificar email de remitente
+3. SES → SMTP Settings → Crear credenciales
+4. Configurar en Railway:
+   ```
+   MAIL_HOST=email-smtp.us-east-1.amazonaws.com
+   MAIL_PORT=587
+   MAIL_USERNAME=tu_smtp_username
+   MAIL_PASSWORD=tu_smtp_password
+   ```
+
+✅ **Funciona en Railway**: Sí
+
+---
+
+## 📊 Comparación
+
+| Opción | Emails Gratis | Dificultad | Tiempo | Funciona |
+|--------|---------------|------------|--------|----------|
+| Puerto 465 Gmail | Ilimitado | Fácil | 5 min | ⚠️ Probablemente no |
+| Brevo | 300/día | Fácil | 10 min | ✅ Sí |
+| Mailgun | 5,000/mes | Fácil | 10 min | ✅ Sí |
+| Amazon SES | 62,000/mes | Media | 15 min | ✅ Sí |
+
+---
+
+## 🎯 Recomendación
+
+1. **Primero**: Prueba puerto 465 (ya configurado)
+2. **Si falla**: Usa **Brevo** (300 emails/día gratis, fácil)
+3. **Alternativa**: Mailgun o Amazon SES
+
+Ver **ALTERNATIVAS_SIN_SENDGRID.md** para instrucciones detalladas.
+
+---
+
+## 📝 Nota Importante
+
+**No necesitas cambiar código** para cambiar de proveedor. Solo actualiza las variables de entorno en Railway:
+
+- `MAIL_HOST`
+- `MAIL_PORT`
+- `MAIL_USERNAME`
+- `MAIL_PASSWORD`
+
+El código actual funciona con cualquier proveedor SMTP.

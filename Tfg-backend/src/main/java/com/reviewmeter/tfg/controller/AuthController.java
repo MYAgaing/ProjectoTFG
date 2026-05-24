@@ -43,6 +43,9 @@ public class AuthController {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private ResendEmailService resendEmailService;
+
     // ── Registro ─────────────────────────────────────────────────────────────
 
     @PostMapping("/register")
@@ -72,7 +75,7 @@ public class AuthController {
         tokenRepository.save(verificacionToken);
 
         // El envío es asíncrono — el registro responde inmediatamente
-        emailService.enviarEmailVerificacion(usuario.getEmail(), usuario.getNombre(), tokenStr);
+        resendEmailService.enviarEmailVerificacion(usuario.getEmail(), usuario.getNombre(), tokenStr);
 
         return ResponseEntity.ok("Registro completado. Revisa tu email para activar tu cuenta.");
     }
@@ -103,7 +106,7 @@ public class AuthController {
             VerificacionToken verificacionToken = new VerificacionToken(tokenStr, usuario);
             tokenRepository.save(verificacionToken);
 
-            emailService.enviarEmailVerificacion(usuario.getEmail(), usuario.getNombre(), tokenStr);
+            resendEmailService.enviarEmailVerificacion(usuario.getEmail(), usuario.getNombre(), tokenStr);
 
             return ResponseEntity.ok("Email de verificación reenviado. Revisa tu bandeja de entrada.");
         } catch (Exception e) {
