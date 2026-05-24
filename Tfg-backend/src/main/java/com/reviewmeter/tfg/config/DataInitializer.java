@@ -217,8 +217,6 @@ public class DataInitializer implements CommandLineRunner {
 				"https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=400", 5);
 		crearProducto("Dell XPS 15", "Portátil premium con pantalla OLED 4K", "Dell", tecnologia,
 				"https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=400", 4);
-		crearProducto("Microsoft Surface Pro 9", "Tablet con teclado convertible en portátil", "Microsoft", tecnologia,
-				"https://images.unsplash.com/photo-1617791160588-241658ad5a1e?w=400", 3);
 
 		// --- VIDEOJUEGOS ---
 		crearProducto("The Legend of Zelda: Tears of the Kingdom", "Aventura épica en el reino de Hyrule", "Nintendo", videojuegos,
