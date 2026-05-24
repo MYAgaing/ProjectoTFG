@@ -41,9 +41,6 @@ public class AuthController {
     private verificacionTokenRepository tokenRepository;
 
     @Autowired
-    private EmailService emailService;
-
-    @Autowired
     private ResendEmailService resendEmailService;
 
     // ── Registro ─────────────────────────────────────────────────────────────
