@@ -100,7 +100,7 @@ public class EmailService {
             Resend resend = new Resend(resendApiKey);
 
             CreateEmailOptions params = CreateEmailOptions.builder()
-                    .from(fromEmail)
+                    .from("onboarding@resend.dev")
                     .to(destinatario)
                     .subject("Verifica tu cuenta en Reviewmeter")
                     .html(html)
