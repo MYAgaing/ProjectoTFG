@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ReporteService } from '../Services/reporte-service';
 import { AdminEstadisticasService } from '../Services/admin-estadisticas-service';
+import { AdminProductoService } from '../Services/admin-producto-service';
 import { AuthServiceTs } from '../Auth/ServiceAuth/auth.service';
 import { Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
@@ -17,7 +18,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 export class Admin implements OnInit {
 
   // ── Tabs ─────────────────────────────────────────────────────────────────────
-  tabActivo: 'reportes' | 'estadisticas' = 'reportes';
+  tabActivo: 'reportes' | 'estadisticas' | 'productos' = 'reportes';
 
   // ── Reportes ─────────────────────────────────────────────────────────────────
   reportes: any[] = [];
@@ -41,9 +42,27 @@ export class Admin implements OnInit {
   filtroEstrellas = 0; // 0 = todas
   private busqueda$ = new Subject<string>();
 
+  // ── Gestión de Productos ────────────────────────────────────────────────────
+  categorias: any[] = [];
+  cargandoCategorias = false;
+  mostrarFormulario = false;
+  formularioProducto = {
+    nombre: '',
+    descripcion: '',
+    marca: '',
+    fechaLanzamiento: '',
+    idCategoria: 0,
+    imagen: null as File | null
+  };
+  imagenPreview: string | null = null;
+  enviandoProducto = false;
+  mensajeProducto = '';
+  errorProducto = false;
+
   constructor(
     private sReporte: ReporteService,
     private sEstadisticas: AdminEstadisticasService,
+    private sProducto: AdminProductoService,
     private auth: AuthServiceTs,
     private router: Router
   ) {}
@@ -177,5 +196,115 @@ export class Admin implements OnInit {
   logout() {
     this.auth.logout();
     this.router.navigate(['/']);
+  }
+
+  // ── Gestión de Productos ────────────────────────────────────────────────────
+
+  cargarCategorias() {
+    this.cargandoCategorias = true;
+    this.sProducto.getCategorias().subscribe({
+      next: (data) => { 
+        this.categorias = data; 
+        this.cargandoCategorias = false; 
+      },
+      error: () => { this.cargandoCategorias = false; }
+    });
+  }
+
+  abrirFormulario() {
+    if (this.categorias.length === 0) {
+      this.cargarCategorias();
+    }
+    this.mostrarFormulario = true;
+    this.resetFormulario();
+  }
+
+  cerrarFormulario() {
+    this.mostrarFormulario = false;
+    this.resetFormulario();
+  }
+
+  resetFormulario() {
+    this.formularioProducto = {
+      nombre: '',
+      descripcion: '',
+      marca: '',
+      fechaLanzamiento: '',
+      idCategoria: 0,
+      imagen: null
+    };
+    this.imagenPreview = null;
+    this.mensajeProducto = '';
+    this.errorProducto = false;
+  }
+
+  onImagenSeleccionada(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.formularioProducto.imagen = file;
+      
+      // Crear preview
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.imagenPreview = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  enviarProducto() {
+    // Validaciones
+    if (!this.formularioProducto.nombre.trim()) {
+      this.mensajeProducto = 'El nombre es obligatorio';
+      this.errorProducto = true;
+      return;
+    }
+    if (!this.formularioProducto.marca.trim()) {
+      this.mensajeProducto = 'La marca es obligatoria';
+      this.errorProducto = true;
+      return;
+    }
+    if (!this.formularioProducto.fechaLanzamiento) {
+      this.mensajeProducto = 'La fecha de lanzamiento es obligatoria';
+      this.errorProducto = true;
+      return;
+    }
+    if (!this.formularioProducto.idCategoria || this.formularioProducto.idCategoria === 0) {
+      this.mensajeProducto = 'Debes seleccionar una categoría';
+      this.errorProducto = true;
+      return;
+    }
+
+    // Crear FormData
+    const formData = new FormData();
+    formData.append('nombre', this.formularioProducto.nombre);
+    formData.append('descripcion', this.formularioProducto.descripcion);
+    formData.append('marca', this.formularioProducto.marca);
+    formData.append('fechaLanzamiento', this.formularioProducto.fechaLanzamiento);
+    formData.append('idCategoria', this.formularioProducto.idCategoria.toString());
+    
+    if (this.formularioProducto.imagen) {
+      formData.append('imagen', this.formularioProducto.imagen);
+    }
+
+    this.enviandoProducto = true;
+    this.mensajeProducto = '';
+    this.errorProducto = false;
+
+    this.sProducto.crearProducto(formData).subscribe({
+      next: (producto) => {
+        this.enviandoProducto = false;
+        this.mensajeProducto = '¡Producto creado exitosamente!';
+        this.errorProducto = false;
+        setTimeout(() => {
+          this.cerrarFormulario();
+        }, 2000);
+      },
+      error: (err) => {
+        this.enviandoProducto = false;
+        this.mensajeProducto = 'Error al crear el producto: ' + (err.error || 'Error desconocido');
+        this.errorProducto = true;
+      }
+    });
   }
 }

@@ -96,15 +96,22 @@ public class AuthController {
             return ResponseEntity.badRequest().body("La cuenta ya está verificada.");
         }
 
-        // Borrar token anterior si existe y crear uno nuevo
-        tokenRepository.deleteByUsuario_IdUsuario(usuario.getIdUsuario());
-        String tokenStr = UUID.randomUUID().toString();
-        VerificacionToken verificacionToken = new VerificacionToken(tokenStr, usuario);
-        tokenRepository.save(verificacionToken);
+        try {
+            // Borrar token anterior si existe y crear uno nuevo
+            tokenRepository.deleteByUsuario_IdUsuario(usuario.getIdUsuario());
+            String tokenStr = UUID.randomUUID().toString();
+            VerificacionToken verificacionToken = new VerificacionToken(tokenStr, usuario);
+            tokenRepository.save(verificacionToken);
 
-        emailService.enviarEmailVerificacion(usuario.getEmail(), usuario.getNombre(), tokenStr);
+            emailService.enviarEmailVerificacion(usuario.getEmail(), usuario.getNombre(), tokenStr);
 
-        return ResponseEntity.ok("Email de verificación reenviado. Revisa tu bandeja de entrada.");
+            return ResponseEntity.ok("Email de verificación reenviado. Revisa tu bandeja de entrada.");
+        } catch (Exception e) {
+            // Log del error para debugging
+            System.err.println("Error al reenviar verificación: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Error al enviar el email. Por favor, intenta más tarde.");
+        }
     }
     // ── Verificación de email ─────────────────────────────────────────────────
 

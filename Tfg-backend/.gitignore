@@ -34,3 +34,7 @@ build/
 
 ### Local config (credenciales) ###
 src/main/resources/application-local.properties
+
+### Uploads (imágenes de productos) ###
+uploads/productos/*
+!uploads/productos/.gitkeep

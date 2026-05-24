@@ -1,5 +1,7 @@
 package com.reviewmeter.tfg.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -12,6 +14,8 @@ import jakarta.mail.internet.MimeMessage;
 
 @Service
 public class EmailService {
+
+    private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
 
     @Autowired
     private JavaMailSender mailSender;
@@ -32,6 +36,7 @@ public class EmailService {
     @Async
     public void enviarEmailVerificacion(String destinatario, String nombre, String token) {
         try {
+            logger.info("Iniciando envío de email de verificación a: {}", destinatario);
 
         String enlace = frontendUrl + "/verificar?token=" + token;
 
@@ -119,11 +124,15 @@ public class EmailService {
         helper.setText(html, true);
 
         mailSender.send(mensaje);
+        
+        logger.info("Email de verificación enviado exitosamente a: {}", destinatario);
 
+        } catch (MessagingException e) {
+            logger.error("Error de mensajería al enviar email de verificación a {}: {}", 
+                    destinatario, e.getMessage(), e);
         } catch (Exception e) {
-            // El fallo de email se registra pero no interrumpe el flujo
-            System.err.println("[EmailService] Error al enviar email de verificación a "
-                    + destinatario + ": " + e.getMessage());
+            logger.error("Error inesperado al enviar email de verificación a {}: {}", 
+                    destinatario, e.getMessage(), e);
         }
     }
 }

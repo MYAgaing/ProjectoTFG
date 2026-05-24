@@ -52,6 +52,8 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.DELETE, "/admin/**").hasRole("ADMIN")
                     .requestMatchers(HttpMethod.PATCH,  "/admin/**").hasRole("ADMIN")
 
+                    .requestMatchers("/uploads/productos/**").permitAll()
+
                     .requestMatchers("/api/reportes/**").authenticated()
 
                     .requestMatchers("/usuario/me").hasAnyRole("USER", "ADMIN")
