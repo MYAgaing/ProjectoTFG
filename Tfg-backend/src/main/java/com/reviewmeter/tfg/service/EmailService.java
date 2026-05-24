@@ -2,25 +2,25 @@ package com.reviewmeter.tfg.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import jakarta.mail.internet.MimeMessage;
+import com.resend.Resend;
+import com.resend.core.exception.ResendException;
+import com.resend.services.emails.model.CreateEmailOptions;
+import com.resend.services.emails.model.CreateEmailResponse;
 
 @Service
 public class EmailService {
 
     private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
 
-    @Autowired
-    private JavaMailSender mailSender;
+    @Value("${resend.api-key}")
+    private String resendApiKey;
 
-    @Value("${spring.mail.username}")
-    private String remitente;
+    @Value("${resend.from-email}")
+    private String fromEmail;
 
     @Value("${app.frontend-url}")
     private String frontendUrl;
@@ -97,18 +97,22 @@ public class EmailService {
                     </html>
                     """.formatted(nombre, enlace, enlace, enlace);
 
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom(remitente);
-            helper.setTo(destinatario);
-            helper.setSubject("Verifica tu cuenta en Reviewmeter");
-            helper.setText(html, true);
+            Resend resend = new Resend(resendApiKey);
 
-            mailSender.send(message);
-            logger.info("Email de verificación enviado exitosamente a: {}", destinatario);
+            CreateEmailOptions params = CreateEmailOptions.builder()
+                    .from(fromEmail)
+                    .to(destinatario)
+                    .subject("Verifica tu cuenta en Reviewmeter")
+                    .html(html)
+                    .build();
 
+            CreateEmailResponse data = resend.emails().send(params);
+            logger.info("Email enviado exitosamente a: {} (ID: {})", destinatario, data.getId());
+
+        } catch (ResendException e) {
+            logger.error("Error de Resend al enviar email a {}: {}", destinatario, e.getMessage(), e);
         } catch (Exception e) {
-            logger.error("Error al enviar email de verificación a {}: {}", destinatario, e.getMessage(), e);
+            logger.error("Error inesperado al enviar email a {}: {}", destinatario, e.getMessage(), e);
         }
     }
 }
