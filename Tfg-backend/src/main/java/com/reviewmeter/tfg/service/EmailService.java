@@ -2,24 +2,24 @@ package com.reviewmeter.tfg.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import jakarta.mail.internet.MimeMessage;
 
 @Service
 public class EmailService {
 
     private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
 
-    @Value("${resend.api-key}")
-    private String resendApiKey;
+    @Autowired
+    private JavaMailSender mailSender;
 
-    @Value("${resend.from-email}")
+    @Value("${spring.mail.username}")
     private String remitente;
 
     @Value("${app.frontend-url}")
@@ -97,46 +97,18 @@ public class EmailService {
                     </html>
                     """.formatted(nombre, enlace, enlace, enlace);
 
-            String body = """
-                    {
-                      "from": "%s",
-                      "to": ["%s"],
-                      "subject": "Verifica tu cuenta en Reviewmeter",
-                      "html": %s
-                    }
-                    """.formatted(remitente, destinatario, toJsonString(html));
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setFrom(remitente);
+            helper.setTo(destinatario);
+            helper.setSubject("Verifica tu cuenta en Reviewmeter");
+            helper.setText(html, true);
 
-            HttpClient client = HttpClient.newHttpClient();
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://api.resend.com/emails"))
-                    .header("Authorization", "Bearer " + resendApiKey)
-                    .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(body))
-                    .build();
-
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() == 200 || response.statusCode() == 201) {
-                logger.info("Email de verificación enviado exitosamente a: {}", destinatario);
-            } else {
-                logger.error("Error al enviar email via Resend. Status: {}, Body: {}", 
-                        response.statusCode(), response.body());
-            }
+            mailSender.send(message);
+            logger.info("Email de verificación enviado exitosamente a: {}", destinatario);
 
         } catch (Exception e) {
-            logger.error("Error inesperado al enviar email de verificación a {}: {}", 
-                    destinatario, e.getMessage(), e);
+            logger.error("Error al enviar email de verificación a {}: {}", destinatario, e.getMessage(), e);
         }
-    }
-
-    // Escapa el HTML para incrustarlo como string JSON válido
-    private String toJsonString(String text) {
-        return "\"" + text
-                .replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "\\r")
-                .replace("\t", "\\t")
-                + "\"";
     }
 }
