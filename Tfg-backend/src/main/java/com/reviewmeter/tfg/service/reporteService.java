@@ -70,15 +70,18 @@ public class reporteService {
 
     /**
      * Eliminar la reseña asociada al reporte.
-     * Gracias al CascadeType.ALL en Resena.reportes,
-     * JPA borra primero los reportes y luego la reseña automáticamente.
+     * Se usa resenaRepo.delete(entity) en lugar de deleteById para que
+     * JPA cargue la entidad en contexto y el CascadeType.ALL elimine
+     * los reportes asociados antes de borrar la reseña.
      */
     public void eliminarResena(Long idReporte) {
         Reporte reporte = reporteRepo.findById(idReporte)
                 .orElseThrow(() -> new RuntimeException("Reporte no encontrado"));
 
-        Long idResena = reporte.getResena().getIdResena();
-        resenaRepo.deleteById(idResena);
+        Resena resena = resenaRepo.findById(reporte.getResena().getIdResena())
+                .orElseThrow(() -> new RuntimeException("Reseña no encontrada"));
+
+        resenaRepo.delete(resena);
     }
 
     /** Comprobar si el usuario ya reportó esta reseña */
