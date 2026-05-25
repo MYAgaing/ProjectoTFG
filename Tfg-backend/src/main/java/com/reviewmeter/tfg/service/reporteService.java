@@ -12,6 +12,7 @@ import com.reviewmeter.tfg.model.Usuario;
 import com.reviewmeter.tfg.repository.reporteRepository;
 import com.reviewmeter.tfg.repository.resenaRepository;
 import com.reviewmeter.tfg.repository.usuarioRepository;
+import com.reviewmeter.tfg.repository.votoUtilRepository;
 
 @Service
 public class reporteService {
@@ -24,6 +25,9 @@ public class reporteService {
 
     @Autowired
     private usuarioRepository usuarioRepo;
+
+    @Autowired
+    private votoUtilRepository votoUtilRepo;
 
     /** Reportar una reseña */
     public Reporte reportar(Long idResena, Long idUsuario, String motivo, String descripcion) {
@@ -70,10 +74,11 @@ public class reporteService {
 
     /**
      * Eliminar la reseña asociada al reporte.
-     * Se usa resenaRepo.delete(entity) en lugar de deleteById para que
-     * JPA cargue la entidad en contexto y el CascadeType.ALL elimine
-     * los reportes asociados antes de borrar la reseña.
+     * Orden de borrado:
+     *   1. votos_util  (FK sin cascade en el modelo)
+     *   2. reseña      (JPA cascade borra sus reportes automáticamente)
      */
+    @org.springframework.transaction.annotation.Transactional
     public void eliminarResena(Long idReporte) {
         Reporte reporte = reporteRepo.findById(idReporte)
                 .orElseThrow(() -> new RuntimeException("Reporte no encontrado"));
@@ -81,6 +86,10 @@ public class reporteService {
         Resena resena = resenaRepo.findById(reporte.getResena().getIdResena())
                 .orElseThrow(() -> new RuntimeException("Reseña no encontrada"));
 
+        // 1. Borrar votos útiles (no tienen cascade en Resena)
+        votoUtilRepo.deleteByResena_IdResena(resena.getIdResena());
+
+        // 2. Borrar la reseña (cascade elimina sus reportes)
         resenaRepo.delete(resena);
     }
 

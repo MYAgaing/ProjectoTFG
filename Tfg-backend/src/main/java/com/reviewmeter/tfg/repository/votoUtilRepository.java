@@ -17,4 +17,7 @@ public interface votoUtilRepository extends JpaRepository<VotoUtil, Long> {
 
     @Transactional
     void deleteByResena_IdResenaAndUsuario_IdUsuario(Long idResena, Long idUsuario);
+
+    @Transactional
+    void deleteByResena_IdResena(Long idResena);
 }
