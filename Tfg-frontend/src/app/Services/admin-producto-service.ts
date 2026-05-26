@@ -14,22 +14,18 @@ export class AdminProductoService {
 
   constructor(private http: HttpClient) { }
 
-  // GET: Obtener todas las categorías
   getCategorias(): Observable<Categoria[]> {
     return this.http.get<Categoria[]>(`${this.baseUrl}/categorias`);
   }
 
-  // POST: Crear producto con imagen
   crearProducto(formData: FormData): Observable<Producto> {
     return this.http.post<Producto>(this.baseUrl, formData);
   }
 
-  // PUT: Actualizar producto
   actualizarProducto(id: number, formData: FormData): Observable<Producto> {
     return this.http.put<Producto>(`${this.baseUrl}/${id}`, formData);
   }
 
-  // DELETE: Eliminar producto
   eliminarProducto(id: number): Observable<string> {
     return this.http.delete(`${this.baseUrl}/${id}`, { responseType: 'text' });
   }

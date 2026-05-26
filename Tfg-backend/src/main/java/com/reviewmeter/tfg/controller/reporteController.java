@@ -26,11 +26,6 @@ public class reporteController {
     @Autowired
     private usuarioRepository usuarioRepo;
 
-    /**
-     * POST /api/reportes/{idResena}
-     * Cualquier usuario autenticado puede reportar una reseña.
-     * Body: { "motivo": "FALSA|INAPROPIADA|SPAM|OTRO", "descripcion": "..." }
-     */
     @PostMapping("/{idResena}")
     public ResponseEntity<?> reportar(
             @PathVariable Long idResena,
@@ -51,10 +46,6 @@ public class reporteController {
         }
     }
 
-    /**
-     * GET /api/reportes/check/{idResena}
-     * Devuelve si el usuario autenticado ya reportó esta reseña.
-     */
     @GetMapping("/check/{idResena}")
     public ResponseEntity<Boolean> check(
             @PathVariable Long idResena,
@@ -64,8 +55,7 @@ public class reporteController {
         return ResponseEntity.ok(reporteService.yaReporto(idResena, idUsuario));
     }
 
-    // ── Helper ───────────────────────────────────────────────────────────────────
-
+    // Extrae el id del usuario a partir del token JWT del header
     private Long extractIdUsuario(String authHeader) {
         String token = authHeader.substring(7);
         String email = jwtService.extractEmail(token);

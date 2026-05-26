@@ -25,9 +25,6 @@ public class FileStorageService {
         }
     }
 
-    /**
-     * Guarda un archivo y devuelve el nombre único generado
-     */
     public String storeFile(MultipartFile file) {
         if (file.isEmpty()) {
             throw new RuntimeException("El archivo está vacío");
@@ -39,7 +36,7 @@ public class FileStorageService {
             extension = originalFilename.substring(originalFilename.lastIndexOf("."));
         }
 
-        // Generar nombre único
+        // UUID para evitar colisiones de nombre
         String fileName = UUID.randomUUID().toString() + extension;
 
         try {
@@ -51,9 +48,6 @@ public class FileStorageService {
         }
     }
 
-    /**
-     * Elimina un archivo del sistema
-     */
     public void deleteFile(String fileName) {
         try {
             Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
@@ -63,9 +57,6 @@ public class FileStorageService {
         }
     }
 
-    /**
-     * Obtiene la ruta del directorio de almacenamiento
-     */
     public Path getFileStorageLocation() {
         return fileStorageLocation;
     }

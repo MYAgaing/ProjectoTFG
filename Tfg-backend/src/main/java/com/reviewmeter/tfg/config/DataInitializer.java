@@ -1,6 +1,5 @@
 package com.reviewmeter.tfg.config;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Random;
@@ -20,22 +19,18 @@ public class DataInitializer implements CommandLineRunner {
 	private final categoriaRepository categoriaRepository;
 	private final productoRepository productoRepository;
 	private final resenaRepository resenaRepository;
-	private final suscripcionRepository suscripcionRepository;
-	private final pagoRepository pagoRepository;
 	private final comentarioRepository comentarioRepository;
 	private final PasswordEncoder passwordEncoder;
 
 	public DataInitializer(rolRepository rolRepository, usuarioRepository usuarioRepository,
 			categoriaRepository categoriaRepository, productoRepository productoRepository,
-			resenaRepository resenaRepository, suscripcionRepository suscripcionRepository,
-			pagoRepository pagoRepository, comentarioRepository comentarioRepository, PasswordEncoder passwordEncoder) {
+			resenaRepository resenaRepository,
+			comentarioRepository comentarioRepository, PasswordEncoder passwordEncoder) {
 		this.rolRepository = rolRepository;
 		this.usuarioRepository = usuarioRepository;
 		this.categoriaRepository = categoriaRepository;
 		this.productoRepository = productoRepository;
 		this.resenaRepository = resenaRepository;
-		this.suscripcionRepository = suscripcionRepository;
-		this.pagoRepository = pagoRepository;
 		this.comentarioRepository = comentarioRepository;
 		this.passwordEncoder = passwordEncoder;
 	}
@@ -50,9 +45,7 @@ public class DataInitializer implements CommandLineRunner {
 
 		System.out.println("Inicializando datos...");
 
-		// ==========================
-		// 1️⃣ ROLES
-		// ==========================
+		// ROLES
 		Rol rolUser = new Rol();
 		rolUser.setNombre("USER");
 		rolRepository.save(rolUser);
@@ -61,9 +54,7 @@ public class DataInitializer implements CommandLineRunner {
 		rolAdmin.setNombre("ADMIN");
 		rolRepository.save(rolAdmin);
 
-		// ==========================
-		// 2️⃣ USUARIOS (30 usuarios)
-		// ==========================
+		// USUARIOS
 		Usuario admin = new Usuario();
 		admin.setNombre("Administrador");
 		admin.setEmail("admin@mail.com");
@@ -95,9 +86,7 @@ public class DataInitializer implements CommandLineRunner {
 
 		List<Usuario> usuarios = usuarioRepository.findAll();
 
-		// ==========================
-		// 3️⃣ CATEGORÍAS
-		// ==========================
+		// CATEGORIAS
 		Categoria tecnologia = new Categoria(); 
 		tecnologia.setNombre("Tecnología"); 
 		tecnologia.setImageUrl("https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800");
@@ -198,11 +187,9 @@ public class DataInitializer implements CommandLineRunner {
 		comida.setImageUrl("https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=800");
 		categoriaRepository.save(comida);
 
-		// ==========================
-		// 4️⃣ PRODUCTOS
-		// ==========================
+		// PRODUCTOS
 
-		// --- TECNOLOGÍA ---
+		// TECNOLOGIA
 		crearProducto("iPhone 15 Pro", "Smartphone Apple con chip A17 Pro y cámara de 48MP", "Apple", tecnologia,
 				"https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=400", 5);
 		crearProducto("iPhone 14", "Smartphone Apple con modo acción en cámara", "Apple", tecnologia,
@@ -218,7 +205,7 @@ public class DataInitializer implements CommandLineRunner {
 		crearProducto("Dell XPS 15", "Portátil premium con pantalla OLED 4K", "Dell", tecnologia,
 				"https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=400", 4);
 
-		// --- VIDEOJUEGOS ---
+		// VIDEOJUEGOS
 		crearProducto("The Legend of Zelda: Tears of the Kingdom", "Aventura épica en el reino de Hyrule", "Nintendo", videojuegos,
 				"https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=400", 5);
 		crearProducto("PlayStation 5", "Consola de última generación de Sony con SSD ultrarrápido", "Sony", videojuegos,
@@ -236,7 +223,7 @@ public class DataInitializer implements CommandLineRunner {
 		crearProducto("Cyberpunk 2077", "RPG de mundo abierto en una ciudad futurista", "CD Projekt Red", videojuegos,
 				"https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400", 4);
 
-		// --- LIBROS ---
+		// LIBROS
 		crearProducto("Clean Code", "Guía para escribir código limpio y mantenible", "Robert C. Martin", libros,
 				"https://images.unsplash.com/photo-1532012197267-da84d127e765?w=400", 5);
 		crearProducto("El Quijote", "La obra cumbre de la literatura española", "Miguel de Cervantes", libros,
@@ -252,7 +239,7 @@ public class DataInitializer implements CommandLineRunner {
 		crearProducto("Atomic Habits", "Técnicas para crear buenos hábitos y eliminar los malos", "James Clear", libros,
 				"https://images.unsplash.com/photo-1554415707-6e8cfc93fe23?w=400", 4);
 
-		// --- ELECTRÓNICA ---
+		// ELECTRONICA
 		crearProducto("Sony WH-1000XM5", "Auriculares inalámbricos con cancelación de ruido líder", "Sony", electronica,
 				"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400", 5);
 		crearProducto("AirPods Pro 2", "Auriculares Apple con cancelación activa de ruido", "Apple", electronica,
@@ -266,7 +253,7 @@ public class DataInitializer implements CommandLineRunner {
 		crearProducto("Kindle Paperwhite", "Lector de libros electrónicos con pantalla sin reflejos", "Amazon", electronica,
 				"https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400", 4);
 
-		// --- MODA ---
+		// MODA
 		crearProducto("Nike Air Max 90", "Las zapatillas icónicas de running con Air Unit visible", "Nike", moda,
 				"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400", 4);
 		crearProducto("Nike Air Force 1", "Las zapatillas más vendidas de la historia de Nike", "Nike", moda,
@@ -280,7 +267,7 @@ public class DataInitializer implements CommandLineRunner {
 		crearProducto("Zara Trench Coat", "Gabardina clásica para todas las estaciones", "Zara", moda,
 				"https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400", 3);
 
-		// --- GAMING ---
+		// JUEGOS
 		crearProducto("Razer DeathAdder V3", "Ratón gaming ergonómico de alto rendimiento 30K DPI", "Razer", gaming,
 				"https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400", 4);
 		crearProducto("Logitech G Pro X Superlight", "Ratón gaming ultraligero para eSports profesionales", "Logitech", gaming,
@@ -294,7 +281,7 @@ public class DataInitializer implements CommandLineRunner {
 		crearProducto("NVIDIA RTX 4080", "Tarjeta gráfica de alta gama para gaming y creación", "NVIDIA", gaming,
 				"https://images.unsplash.com/photo-1591488320449-011701bb6704?w=400", 5);
 
-		// --- SALUD ---
+		// SALUD
 		crearProducto("Fitbit Charge 6", "Pulsera de actividad con GPS y sensor de estrés", "Fitbit", salud,
 				"https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=400", 4);
 		crearProducto("Garmin Forerunner 965", "Reloj GPS premium para corredores avanzados", "Garmin", salud,
@@ -304,7 +291,7 @@ public class DataInitializer implements CommandLineRunner {
 		crearProducto("Oura Ring Gen 3", "Anillo inteligente con monitoreo de salud 24/7", "Oura", salud,
 				"https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=400", 4);
 
-		// --- FOTOGRAFÍA ---
+		// FOTOGRAFIA
 		crearProducto("Canon EOS R50", "Cámara mirrorless compacta ideal para principiantes", "Canon", fotografia,
 				"https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400", 4);
 		crearProducto("Sony A7 IV", "Cámara mirrorless de fotograma completo para profesionales", "Sony", fotografia,
@@ -391,9 +378,7 @@ public class DataInitializer implements CommandLineRunner {
 		List<Producto> productos = productoRepository.findAll();
 		Random random = new Random();
 
-		// ==========================
-		// 5️⃣ RESEÑAS (150 reseñas)
-		// ==========================
+		// RESEÑAS
 		String[] titulos = {
 			"Excelente producto", "Muy buena compra", "Totalmente recomendable", "Superó mis expectativas",
 			"Buena relación calidad-precio", "Lo esperaba mejor", "Funciona perfecto", "Increíble calidad",
@@ -425,13 +410,13 @@ public class DataInitializer implements CommandLineRunner {
 			"Lo recomiendo a todo el mundo. Ya se lo he dicho a todos mis amigos y familia sin excepción."
 		};
 
-		// Pesos de puntuación: más reseñas de 4 y 5 estrellas para datos realistas
+		// PUNTUACIONES
 		int[] puntuacionesPosibles = {1, 2, 3, 3, 4, 4, 4, 5, 5, 5};
 
-		// Los primeros 10 productos reciben muchas reseñas para tener estadísticas ricas
+		// BUENAS ESTADISTICAS LOS PRIMEROS
 		List<Producto> productosDestacados = productos.subList(0, Math.min(10, productos.size()));
 
-		// 100 reseñas concentradas en los 10 primeros productos
+		// 100 reseñas
 		for (int i = 0; i < 100; i++) {
 			Resena r = new Resena();
 			r.setTitulo(titulos[random.nextInt(titulos.length)]);
@@ -457,40 +442,7 @@ public class DataInitializer implements CommandLineRunner {
 
 		List<Resena> resenas = resenaRepository.findAll();
 
-		// ==========================
-		// 6️⃣ SUSCRIPCIONES Y PAGOS
-		// ==========================
-		String[] tiposSuscripcion = {"FREE", "BASIC", "PREMIUM"};
-		BigDecimal[] precios = {BigDecimal.ZERO, new BigDecimal("4.99"), new BigDecimal("9.99")};
-
-		for (int i = 0; i < usuarios.size(); i++) {
-			Usuario u = usuarios.get(i);
-			int tipoIdx = i % 3;
-
-			Suscripcion s = new Suscripcion();
-			s.setTipo(tiposSuscripcion[tipoIdx]);
-			s.setPrecio(precios[tipoIdx]);
-			s.setFechaInicio(LocalDate.now().minusMonths(random.nextInt(6) + 1));
-			s.setFechaFin(LocalDate.now().plusMonths(random.nextInt(12) + 1));
-			s.setEstado(true);
-			s.setUsuario(u);
-			suscripcionRepository.save(s);
-
-			if (tipoIdx > 0) {
-				Pago pago = new Pago();
-				pago.setImporte(precios[tipoIdx]);
-				pago.setFechaPago(LocalDate.now().minusDays(random.nextInt(30)));
-				pago.setMetodoPago(random.nextBoolean() ? "TARJETA" : "PAYPAL");
-				pago.setEstado("COMPLETADO");
-				pago.setUsuario(u);
-				pago.setSuscripcion(s);
-				pagoRepository.save(pago);
-			}
-		}
-
-		// ==========================
-		// 7️⃣ COMENTARIOS (100 comentarios)
-		// ==========================
+		// COMENTARIOS
 		String[] contenidosComentario = {
 			"Totalmente de acuerdo con esta reseña, yo tuve la misma experiencia.",
 			"Gracias por el análisis tan detallado, me ha ayudado mucho a decidir.",
@@ -523,15 +475,12 @@ public class DataInitializer implements CommandLineRunner {
 		System.out.println("   - " + productos.size() + " productos");
 		System.out.println("   - 200 reseñas (100 concentradas en los 10 primeros productos)");
 		System.out.println("   - 100 comentarios");
-		System.out.println("   - Suscripciones y pagos para todos los usuarios");
 		System.out.println("   ► Productos con más datos: iPhone 15 Pro, iPhone 14, Samsung Galaxy S24 Ultra,");
 		System.out.println("     Google Pixel 8 Pro, MacBook Air M3, MacBook Pro 16, Dell XPS 15,");
 		System.out.println("     Microsoft Surface Pro 9, Zelda TOTK, PlayStation 5");
 	}
 
-	// ==========================
-	// MÉTODO AUXILIAR
-	// ==========================
+	// METODO DE IMPLEMENTACIÓN
 	private void crearProducto(String nombre, String descripcion, String marca, Categoria categoria, String imagen, Integer valoracion) {
 		Producto p = new Producto();
 		p.setNombre(nombre);

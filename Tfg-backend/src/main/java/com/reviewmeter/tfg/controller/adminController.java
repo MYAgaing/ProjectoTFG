@@ -17,19 +17,16 @@ public class adminController {
     @Autowired
     private reporteService reporteService;
 
-    /** GET /admin/reportes/pendientes */
     @GetMapping("/pendientes")
     public ResponseEntity<List<Reporte>> getPendientes() {
         return ResponseEntity.ok(reporteService.getPendientes());
     }
 
-    /** GET /admin/reportes/todos */
     @GetMapping("/todos")
     public ResponseEntity<List<Reporte>> getTodos() {
         return ResponseEntity.ok(reporteService.getTodos());
     }
 
-    /** PUT /admin/reportes/{id}/descartar */
     @PutMapping("/{id}/descartar")
     public ResponseEntity<?> descartar(@PathVariable Long id) {
         try {
@@ -39,7 +36,6 @@ public class adminController {
         }
     }
 
-    /** PUT /admin/reportes/{id}/eliminar-resena */
     @PutMapping("/{id}/eliminar-resena")
     public ResponseEntity<String> eliminarResena(@PathVariable Long id) {
         try {

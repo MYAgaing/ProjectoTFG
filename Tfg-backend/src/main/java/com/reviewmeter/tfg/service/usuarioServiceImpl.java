@@ -63,7 +63,7 @@ public class usuarioServiceImpl implements usuarioService {
 		Usuario usuarioExistente = usuarioRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("Usuario no encontrado con id: " + id));
 		usuarioRepository.delete(usuarioExistente);
-		return "Suscripcion eliminada correctamente";
+		return "Usuario eliminado correctamente";
 	}
 	
 	@Override

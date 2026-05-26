@@ -32,19 +32,11 @@ public class adminProductoController {
     @Value("${app.backend-url:http://localhost:8080}")
     private String backendUrl;
 
-    /**
-     * GET /admin/productos/categorias
-     * Obtiene todas las categorías para el formulario
-     */
     @GetMapping("/categorias")
     public ResponseEntity<List<Categoria>> getCategorias() {
         return ResponseEntity.ok(categoriaRepo.findAll());
     }
 
-    /**
-     * POST /admin/productos
-     * Crea un nuevo producto con imagen
-     */
     @PostMapping
     public ResponseEntity<?> crearProducto(
             @RequestParam("nombre") String nombre,
@@ -55,11 +47,9 @@ public class adminProductoController {
             @RequestParam(value = "imagen", required = false) MultipartFile imagen) {
 
         try {
-            // Validar categoría
             Categoria categoria = categoriaRepo.findById(idCategoria)
                     .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
 
-            // Crear producto
             Producto producto = new Producto();
             producto.setNombre(nombre);
             producto.setDescripcion(descripcion);
@@ -68,13 +58,12 @@ public class adminProductoController {
             producto.setCategoria(categoria);
             producto.setValoracion(0);
 
-            // Procesar imagen si existe
             if (imagen != null && !imagen.isEmpty()) {
                 String fileName = fileStorageService.storeFile(imagen);
                 String imageUrl = backendUrl + "/uploads/productos/" + fileName;
                 producto.setImageUrl(imageUrl);
             } else {
-                // Imagen por defecto
+                // Si no mandan imagen uso un placeholder para que no quede vacío
                 producto.setImageUrl("https://via.placeholder.com/400x300?text=Sin+Imagen");
             }
 
@@ -86,10 +75,6 @@ public class adminProductoController {
         }
     }
 
-    /**
-     * PUT /admin/productos/{id}
-     * Actualiza un producto existente
-     */
     @PutMapping("/{id}")
     public ResponseEntity<?> actualizarProducto(
             @PathVariable Long id,
@@ -113,9 +98,8 @@ public class adminProductoController {
             producto.setFechaLanzamiento(LocalDate.parse(fechaLanzamiento));
             producto.setCategoria(categoria);
 
-            // Si hay nueva imagen, reemplazar la anterior
+            // Si mandan imagen nueva borro la anterior y guardo la nueva
             if (imagen != null && !imagen.isEmpty()) {
-                // Eliminar imagen anterior si existe y no es placeholder
                 String oldImageUrl = producto.getImageUrl();
                 if (oldImageUrl != null && oldImageUrl.contains("/uploads/productos/")) {
                     String oldFileName = oldImageUrl.substring(oldImageUrl.lastIndexOf("/") + 1);
@@ -135,17 +119,13 @@ public class adminProductoController {
         }
     }
 
-    /**
-     * DELETE /admin/productos/{id}
-     * Elimina un producto
-     */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> eliminarProducto(@PathVariable Long id) {
         try {
             Producto producto = productoRepo.findById(id)
                     .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
-            // Eliminar imagen si existe
+            // Borro la imagen del disco si no es un placeholder externo
             String imageUrl = producto.getImageUrl();
             if (imageUrl != null && imageUrl.contains("/uploads/productos/")) {
                 String fileName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);

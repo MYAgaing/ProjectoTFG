@@ -23,30 +23,24 @@ export class ResenaService {
     return this.http.get<Resena>(`${this.baseUrl}/${id}`);
   }
 
-  // POST: Crear reseña con token JWT
   crearResena(resena: Resena): Observable<Resena> {
     const token = localStorage.getItem('token');
     const headers = { Authorization: `Bearer ${token}` };
     return this.http.post<Resena>(this.baseUrl, resena, { headers });
   }
 
-  // PUT: Actualizar reseña con token JWT
   actualizarResena(id: number, resena: Resena): Observable<Resena> {
     const token = localStorage.getItem('token');
     const headers = { Authorization: `Bearer ${token}` };
     return this.http.put<Resena>(`${this.baseUrl}/${id}`, resena, { headers });
   }
 
-  // DELETE: Borrar reseña con token JWT
   borrarResena(id: number): Observable<string> {
     const token = localStorage.getItem('token');
     const headers = { Authorization: `Bearer ${token}` };
     return this.http.delete(`${this.baseUrl}/${id}`, { headers, responseType: 'text' });
   }
 
-  // --- MÉTODOS DE FILTRADO Y ORDENACIÓN ---
-
-  // GET: Filtrar por rango de fechas
   filtrarPorFechas(inicio: string, fin: string): Observable<Resena[]> {
     const params = new HttpParams()
       .set('inicio', inicio)
@@ -54,22 +48,19 @@ export class ResenaService {
     return this.http.get<Resena[]>(`${this.baseUrl}/filtro-fechas`, { params });
   }
 
-  // GET: Filtrar por puntuación mínima
   filtrarPorPuntuacion(min: number): Observable<Resena[]> {
     return this.http.get<Resena[]>(`${this.baseUrl}/puntuacion/${min}`);
   }
 
-  // GET: Ordenar Descendente
   ordenarPorPuntuacionDesc(): Observable<Resena[]> {
     return this.http.get<Resena[]>(`${this.baseUrl}/orden-desc`);
   }
 
-  // GET: Ordenar Ascendente
   ordenarPorPuntuacionAsc(): Observable<Resena[]> {
     return this.http.get<Resena[]>(`${this.baseUrl}/orden-asc`);
   }
 
-  // GET: Obtener solo las reseñas de un producto específico con filtros opcionales
+  // Acepta orden y puntuación mínima como filtros opcionales
   getResenasPorProducto(idProducto: number, orden?: string, minPuntuacion?: number): Observable<any[]> {
     let params: any = {};
     if (orden) params.orden = orden;
@@ -78,12 +69,11 @@ export class ResenaService {
     return this.http.get<any[]>(`${this.baseUrl}/producto/${idProducto}`, { params });
   }
 
-  // GET: Reseñas destacadas para el home (top 6)
+  // Devuelve las 6 reseñas con mejor puntuación para mostrar en el home
   getResenasDestacadas(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/destacadas`);
   }
 
-  // GET: Mis reseñas (requiere token)
   getMisResenas(): Observable<any[]> {
     const token = localStorage.getItem('token');
     return this.http.get<any[]>(`${this.baseUrl}/mis-resenas`, {

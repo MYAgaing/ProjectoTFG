@@ -26,20 +26,11 @@ public class RespuestaResenaController {
     @Autowired private usuarioRepository usuarioRepo;
     @Autowired private JwtService jwtService;
 
-    /**
-     * GET /api/resenas/{id}/respuestas
-     * Devuelve todas las respuestas de una reseña. Público.
-     */
     @GetMapping("/{id}/respuestas")
     public ResponseEntity<List<RespuestaResena>> getRespuestas(@PathVariable Long id) {
         return ResponseEntity.ok(respuestaRepo.findByResena_IdResenaOrderByFechaAsc(id));
     }
 
-    /**
-     * POST /api/resenas/{id}/respuestas
-     * Crea una respuesta. Requiere autenticación.
-     * Body: { "texto": "..." }
-     */
     @PostMapping("/{id}/respuestas")
     public ResponseEntity<?> crearRespuesta(
             @PathVariable Long id,
@@ -69,10 +60,6 @@ public class RespuestaResenaController {
         return ResponseEntity.ok(respuestaRepo.save(respuesta));
     }
 
-    /**
-     * DELETE /api/resenas/{idResena}/respuestas/{idRespuesta}
-     * Borra una respuesta. Solo el autor puede borrarla.
-     */
     @DeleteMapping("/{idResena}/respuestas/{idRespuesta}")
     public ResponseEntity<String> borrarRespuesta(
             @PathVariable Long idResena,

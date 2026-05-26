@@ -30,19 +30,11 @@ public class adminEstadisticasController {
     @Autowired
     private productoRepository productoRepo;
 
-    /**
-     * GET /admin/estadisticas/buscar?nombre=xxx
-     * Busca productos por nombre para el buscador del panel.
-     */
     @GetMapping("/buscar")
     public ResponseEntity<List<Producto>> buscarProductos(@RequestParam String nombre) {
         return ResponseEntity.ok(productoRepo.findByNombreContainingIgnoreCase(nombre));
     }
 
-    /**
-     * GET /admin/estadisticas/producto/{id}
-     * Devuelve todas las estadísticas de un producto.
-     */
     @GetMapping("/producto/{id}")
     public ResponseEntity<?> estadisticasProducto(@PathVariable Long id) {
 
@@ -53,7 +45,7 @@ public class adminEstadisticasController {
         Producto producto = productoRepo.findById(id).get();
         Map<String, Object> stats = new LinkedHashMap<>();
 
-        // ── Métricas básicas ─────────────────────────────────────────────────────
+        // Métricas básicas del producto
         long total = resenaRepo.countByProducto(id);
         Double avg = resenaRepo.avgPuntuacionByProducto(id);
         double media = avg != null
@@ -68,7 +60,7 @@ public class adminEstadisticasController {
         stats.put("totalResenas", total);
         stats.put("puntuacionMedia", media);
 
-        // ── Distribución por estrellas ───────────────────────────────────────────
+        // Distribución por estrellas del 1 al 5
         Map<Integer, Long> distribucion = new LinkedHashMap<>();
         for (int i = 1; i <= 5; i++) distribucion.put(i, 0L);
         for (Object[] row : resenaRepo.distribucionPuntuacionByProducto(id)) {
@@ -76,7 +68,7 @@ public class adminEstadisticasController {
         }
         stats.put("distribucion", distribucion);
 
-        // ── Porcentaje por estrella ──────────────────────────────────────────────
+        // Porcentaje de cada estrella sobre el total
         Map<Integer, Double> porcentajes = new LinkedHashMap<>();
         for (int i = 1; i <= 5; i++) {
             double pct = total > 0
@@ -87,7 +79,7 @@ public class adminEstadisticasController {
         }
         stats.put("porcentajes", porcentajes);
 
-        // ── Evolución mensual últimos 6 meses ────────────────────────────────────
+        // Evolución mensual de los últimos 6 meses
         LocalDate desde = LocalDate.now().minusMonths(6).withDayOfMonth(1);
         List<Object[]> rawEvolucion = resenaRepo.evolucionMensualByProducto(id, desde);
 
@@ -122,7 +114,7 @@ public class adminEstadisticasController {
         }
         stats.put("evolucionMensual", evolucion);
 
-        // ── Últimas 5 reseñas ────────────────────────────────────────────────────
+        // Las 5 reseñas más recientes del producto
         List<Resena> ultimas = resenaRepo.findTop5ByProductoOrderByFechaDesc(
                 id, PageRequest.of(0, 5));
         List<Map<String, Object>> ultimasDto = new ArrayList<>();
