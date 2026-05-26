@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://projectotfg-production.up.railway.app'
+  apiUrl: 'https://mellow-vibrancy-production.up.railway.app'
 };

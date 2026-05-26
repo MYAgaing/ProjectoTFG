@@ -81,7 +81,8 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:4200",
                 "https://motivated-energy-production.up.railway.app",
-                "https://projectotfg-production.up.railway.app"
+                "https://projectotfg-production.up.railway.app",
+                "https://mellow-vibrancy-production.up.railway.app"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept"));
