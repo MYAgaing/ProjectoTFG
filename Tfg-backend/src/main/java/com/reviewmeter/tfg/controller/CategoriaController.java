@@ -18,7 +18,6 @@ import com.reviewmeter.tfg.service.categoriaService;
 
 @RestController
 @RequestMapping("/api/categorias")
-@CrossOrigin(origins = "http://localhost:4200")
 public class CategoriaController {
 
 	private final categoriaService categoriaService;
